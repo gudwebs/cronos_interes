@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio Visual: Teoría del Interés — Parcial 3</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fuente Inter con fallback limpio -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-app: #F8FAFC;
+      --border-soft: #E2E8F0;
+      --ff-orange: #EA580C;
+      --ff-amber: #F97316;
+      --back-blue: #2563EB;
+      --fwd-green: #059669;
+      --trap-purple: #7C3AED;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-app);
+      color: #0F172A;
+      overflow-x: hidden;
+    }
+
+    /* Notación matemática limpia y ángulo actuarial */
+    .math-expr {
+      font-family: 'Cambria Math', 'Times New Roman', Georgia, serif;
+      font-size: 1.08em;
+      letter-spacing: 0.01em;
+    }
+
+    .act-angle {
+      display: inline-block;
+      border-top: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      padding: 0 3px 0 2px;
+      margin-right: 1px;
+      line-height: 1.05;
+      font-size: 0.85em;
+    }
+
+    .math-frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 3px;
+      font-size: 0.92em;
+      line-height: 1.15;
+    }
+
+    .math-frac .num {
+      border-bottom: 1.4px solid currentColor;
+      padding: 0 4px 1px;
+    }
+
+    .math-frac .den {
+      padding: 1px 4px 0;
+    }
+
+    .ddot {
+      position: relative;
+      display: inline-block;
+    }
+
+    .ddot::before {
+      content: "¨";
+      position: absolute;
+      top: -0.45em;
+      left: 0.06em;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    /* Animaciones SVG suaves */
+    @keyframes drawPath {
+      from {
+        stroke-dashoffset: 1000;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .animate-draw {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawPath 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .animate-draw-delayed {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: drawPath 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+    }
+
+    @keyframes pulsePin {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.95;
+      }
+      50% {
+        transform: scale(1.22);
+        opacity: 0.55;
+      }
+    }
+
+    .pin-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pulsePin 1.7s ease-in-out infinite;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeSlideUp 0.3s ease-out forwards;
+    }
+
+    /* Scrollbar sutil */
+    ::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Estilo tipo cuaderno sutil para el área del gráfico */
+    .notebook-grid {
+      background-color: #FFFFFF;
+      background-image:
+        linear-gradient(to right, rgba(226, 232, 240, 0.45) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(226, 232, 240, 0.45) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Encabezado principal -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white flex items-center justify-center shadow-sm shrink-0">
+            <!-- Ícono brújula / línea de tiempo -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Laboratorio Visual: Teoría del Interés — Parcial 3
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium">
+              Líneas de tiempo, Fecha Focal, Anualidades Diferidas, Pagos Extra y Saldos Insolutos
+            </p>
+          </div>
+        </div>
+
+        <!-- Leyenda semántica de colores siempre visible -->
+        <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-600"></span> Fecha Focal (FF)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> Atrás / VP (1+i)<sup>-k</sup>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Adelante / VF (1+i)<sup>+k</sup>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> Extra / Trampa
+          </span>
+        </div>
+      </div>
+
+      <!-- Navegación de 3 pestañas -->
+      <nav class="mt-3.5 flex flex-wrap gap-2" role="tablist" aria-label="Secciones del laboratorio">
+        <button id="tab-btn-1" onclick="switchTab(1)" role="tab" aria-selected="true"
+          class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-orange-600 text-white shadow-sm">
+          <span>1.</span> Brújula: ¿Adelante o Atrás?
+        </button>
+        <button id="tab-btn-2" onclick="switchTab(2)" role="tab" aria-selected="false"
+          class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span>2.</span> Tus 8 Ejercicios Paso a Paso
+        </button>
+        <button id="tab-btn-3" onclick="switchTab(3)" role="tab" aria-selected="false"
+          class="tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <span>3.</span> Mapa de Decisión y Detector de Trampas
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 1: BRÚJULA ¿ADELANTE O ATRÁS?                                 -->
+    <!-- ===================================================================== -->
+    <section id="tab-panel-1" class="space-y-5 fade-in">
+      <!-- Regla rápida de orientación -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Simulador Interactivo de Líneas de Tiempo</h2>
+            <p class="text-sm text-slate-600 mt-0.5">
+              Elige un flujo, mueve la <span class="font-bold text-orange-600">Fecha Focal (FF)</span> y presiona <span class="font-bold text-slate-800">Animar Movimiento</span> para ver exactamente dónde te deja la fórmula y hacia dónde viaja el dinero.
+            </p>
+          </div>
+          <button onclick="runCompassAnimation()"
+            class="px-5 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-95 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 shrink-0">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+            Animar Movimiento (2 Fases)
+          </button>
+        </div>
+
+        <!-- Controles: Tipo de flujo + Fórmula base + Slider FF -->
+        <div class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-4 pt-4 border-t border-slate-100">
+          <!-- Selector de flujo -->
+          <div class="lg:col-span-5 space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">1. Elige el tipo de flujo</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="compass-flow-buttons">
+              <button onclick="setCompassFlow('single')" data-flow="single"
+                class="flow-opt text-left px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all">
+                Flujo Único<br /><span class="text-xs font-normal opacity-80">$1,000 en t = 5</span>
+              </button>
+              <button onclick="setCompassFlow('ordinary')" data-flow="ordinary"
+                class="flow-opt text-left px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all">
+                Anualidad Vencida<br /><span class="text-xs font-normal opacity-80">Pagos en t = 1..5</span>
+              </button>
+              <button onclick="setCompassFlow('due')" data-flow="due"
+                class="flow-opt text-left px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all">
+                Anualidad Anticipada<br /><span class="text-xs font-normal opacity-80">Pagos en t = 0..4</span>
+              </button>
+              <button onclick="setCompassFlow('deferred')" data-flow="deferred"
+                class="flow-opt text-left px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all">
+                Anualidad Diferida<br /><span class="text-xs font-normal opacity-80">Pagos en t = 4..8</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Selector de fórmula de agrupación (VP vs VF) -->
+          <div class="lg:col-span-3 space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">2. Agrupar con fórmula</label>
+            <div id="compass-mode-wrapper" class="flex flex-col gap-2">
+              <button id="compass-mode-vp" onclick="setCompassFormulaMode('vp')"
+                class="px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-bold text-left transition-all">
+                Valor Presente (<span class="math-expr">a<sub><span class="act-angle">n</span>|i</sub></span> / <span class="math-expr"><span class="ddot">a</span><sub><span class="act-angle">n</span>|i</sub></span>)
+              </button>
+              <button id="compass-mode-vf" onclick="setCompassFormulaMode('vf')"
+                class="px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-bold text-left transition-all">
+                Valor Futuro (<span class="math-expr">s<sub><span class="act-angle">n</span>|i</sub></span> / <span class="math-expr"><span class="ddot">s</span><sub><span class="act-angle">n</span>|i</sub></span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Control Fecha Focal -->
+          <div class="lg:col-span-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="ff-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500">3. Fecha Focal (FF)</label>
+              <span id="ff-badge" class="px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-extrabold">t = 0</span>
+            </div>
+            <input id="ff-slider" type="range" min="0" max="10" value="0" oninput="setCompassFF(parseInt(this.value))"
+              class="w-full accent-orange-600 cursor-pointer h-2.5 bg-slate-200 rounded-lg" />
+            <div class="flex justify-between text-[11px] font-semibold text-slate-400 px-0.5">
+              <span>t=0</span><span>t=2</span><span>t=4</span><span>t=6</span><span>t=8</span><span>t=10</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              Tip: También puedes hacer <strong>clic directo en cualquier número (0..10)</strong> de la línea de tiempo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lienzo SVG de la Brújula -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!-- Barra de estado de las 2 fases -->
+        <div class="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="phase-pill-1" class="px-3 py-1 rounded-full bg-slate-200 text-slate-600 transition-all">
+              Fase 1: Agrupación de pagos
+            </span>
+            <span class="text-slate-400">→</span>
+            <span id="phase-pill-2" class="px-3 py-1 rounded-full bg-slate-200 text-slate-600 transition-all">
+              Fase 2: Traslado a Fecha Focal
+            </span>
+          </div>
+          <span id="compass-pin-hint" class="text-slate-600 font-bold"></span>
+        </div>
+
+        <div class="p-3 sm:p-5 notebook-grid overflow-x-auto">
+          <svg id="compass-svg" viewBox="0 0 920 310" class="w-full min-w-[640px] h-auto select-none" aria-label="Línea de tiempo interactiva"></svg>
+        </div>
+      </div>
+
+      <!-- Tarjeta explicativa dinámica -->
+      <div id="compass-explanation" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 2: TUS 8 EJERCICIOS PASO A PASO                               -->
+    <!-- ===================================================================== -->
+    <section id="tab-panel-2" class="hidden space-y-5 fade-in">
+      <!-- Selector de ejercicios en 3 bloques -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Bloque 1: Diferidas -->
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-blue-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-600"></span> Bloque 1: Anualidades Diferidas
+            </p>
+            <div class="space-y-1.5" id="ex-group-1"></div>
+          </div>
+          <!-- Bloque 2: Tiempo y Pagos Extra -->
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-violet-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-violet-600"></span> Bloque 2: Tiempo (n) y Pagos Extra
+            </p>
+            <div class="space-y-1.5" id="ex-group-2"></div>
+          </div>
+          <!-- Bloque 3: Saldos Insolutos -->
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 mb-2 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span> Bloque 3: Saldos Insolutos
+            </p>
+            <div class="space-y-1.5" id="ex-group-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel activo del ejercicio -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!-- Cabecera del ejercicio -->
+        <div class="p-4 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+            <div class="space-y-1.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="ex-category-badge" class="px-2.5 py-0.5 rounded-full text-xs font-extrabold"></span>
+                <span id="ex-result-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold"></span>
+              </div>
+              <h2 id="ex-title" class="text-lg sm:text-xl font-extrabold text-slate-900"></h2>
+              <p id="ex-statement" class="text-sm text-slate-700 leading-relaxed max-w-4xl"></p>
+            </div>
+
+            <!-- Interruptor especial (solo aparece en Ej. 2 y Ej. 6) -->
+            <div id="ex-variant-box" class="hidden shrink-0 bg-orange-50 border border-orange-200 rounded-xl p-3">
+              <p id="ex-variant-label" class="text-[11px] font-extrabold uppercase tracking-wider text-orange-800 mb-2"></p>
+              <div class="flex gap-1.5" id="ex-variant-buttons"></div>
+            </div>
+          </div>
+
+          <!-- Datos extraídos rápido -->
+          <div id="ex-data-pills" class="mt-3.5 flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Barra de pasos del curso (1 a 4) y controles de reproducción -->
+        <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1" id="ex-step-tabs">
+            <button onclick="setExerciseStep(1)" data-step="1" class="ex-step-pill px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left">
+              1. Línea de Tiempo
+            </button>
+            <button onclick="setExerciseStep(2)" data-step="2" class="ex-step-pill px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left">
+              2. Fecha Focal
+            </button>
+            <button onclick="setExerciseStep(3)" data-step="3" class="ex-step-pill px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left">
+              3. Dirección de Flujos
+            </button>
+            <button onclick="setExerciseStep(4)" data-step="4" class="ex-step-pill px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left">
+              4. Ecuación y Despeje
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="prevExerciseStep()" id="btn-prev-step"
+              class="px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all">
+              ← Anterior
+            </button>
+            <button onclick="nextExerciseStep()" id="btn-next-step"
+              class="px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all">
+              Siguiente →
+            </button>
+            <button onclick="playExerciseAnimation()" id="btn-play-ex"
+              class="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+              </svg>
+              Reproducir Animación
+            </button>
+          </div>
+        </div>
+
+        <!-- Gráfico SVG del Ejercicio -->
+        <div class="p-3 sm:p-5 notebook-grid border-b border-slate-200 overflow-x-auto">
+          <svg id="exercise-svg" viewBox="0 0 920 315" class="w-full min-w-[660px] h-auto select-none" aria-label="Diagrama animado del ejercicio"></svg>
+        </div>
+
+        <!-- Explicación del paso actual + Ecuación paso a paso -->
+        <div class="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-5 space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-extrabold" id="ex-step-label"></div>
+            <h3 id="ex-step-heading" class="text-base sm:text-lg font-extrabold text-slate-900"></h3>
+            <p id="ex-step-text" class="text-sm text-slate-700 leading-relaxed"></p>
+            <div id="ex-note-callout" class="hidden rounded-xl p-3.5 text-xs sm:text-sm leading-relaxed"></div>
+          </div>
+
+          <div class="lg:col-span-7 bg-slate-50 rounded-2xl border border-slate-200 p-4 sm:p-5">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-3">Desarrollo Matemático (Método de tus notas)</p>
+            <div id="ex-math-steps" class="space-y-3 text-sm text-slate-800"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- PESTAÑA 3: MAPA DE DECISIÓN Y DETECTOR DE TRAMPAS                     -->
+    <!-- ===================================================================== -->
+    <section id="tab-panel-3" class="hidden space-y-6 fade-in">
+
+      <!-- SECCIÓN A: ASISTENTE "¿QUÉ FÓRMULA USO?" -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+        <div class="mb-5">
+          <span class="px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-800 text-xs font-extrabold">Sección A</span>
+          <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">Asistente Interactivo: "¿Qué fórmula uso?"</h2>
+          <p class="text-sm text-slate-600">Responde estas 3 preguntas rápidas de tu problema y obtén al instante la fórmula ganadora, la dirección y el truco clave.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Pregunta 1 -->
+          <div class="space-y-2">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">1. ¿Qué estás buscando?</p>
+            <div class="space-y-2" id="wiz-q1"></div>
+          </div>
+          <!-- Pregunta 2 -->
+          <div class="space-y-2">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">2. ¿Qué datos conoces?</p>
+            <div class="space-y-2" id="wiz-q2"></div>
+          </div>
+          <!-- Pregunta 3 -->
+          <div class="space-y-2">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500">3. ¿Cuándo ocurren los pagos / momento?</p>
+            <div class="space-y-2" id="wiz-q3"></div>
+          </div>
+        </div>
+
+        <!-- Resultado del asistente -->
+        <div id="wiz-result" class="mt-6 rounded-2xl border-2 p-5 transition-all"></div>
+      </div>
+
+      <!-- SECCIÓN B: MINI-RETO DETECTOR DE TRAMPAS -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-violet-100 text-violet-800 text-xs font-extrabold">Sección B · 5 Preguntas Clave</span>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">Mini-Reto: Detector de Trampas de Examen</h2>
+            <p class="text-sm text-slate-600">Los 5 detalles de un solo periodo donde se pierden más puntos en el tercer parcial.</p>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 text-sm font-extrabold text-slate-800">
+              Puntuación: <span id="quiz-score" class="text-violet-700">0</span> / 5
+            </div>
+            <button onclick="resetQuiz()"
+              class="px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all">
+              Reiniciar
+            </button>
+          </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <span><strong>Regla de oro del Parcial 3:</strong> Lo que se debe = Lo que se paga (evaluado siempre en la misma Fecha Focal).</span>
+      <span>Laboratorio Visual · Teoría del Interés</span>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================================
+       UTILIDADES MATEMÁTICAS Y DE NOTACIÓN ACTUARIAL
+    ========================================================================= */
+    const mathA = (n, i) => `<span class="math-expr">a<sub><span class="act-angle">${n}</span>|${i}</sub></span>`;
+    const mathADue = (n, i) => `<span class="math-expr"><span class="ddot">a</span><sub><span class="act-angle">${n}</span>|${i}</sub></span>`;
+    const mathS = (n, i) => `<span class="math-expr">s<sub><span class="act-angle">${n}</span>|${i}</sub></span>`;
+    const mathSDue = (n, i) => `<span class="math-expr"><span class="ddot">s</span><sub><span class="act-angle">${n}</span>|${i}</sub></span>`;
+    const frac = (num, den) => `<span class="math-frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+
+    // Helper para crear elementos SVG
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    function svgEl(tag, attrs = {}, text = null) {
+      const el = document.createElementNS(SVG_NS, tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        el.setAttribute(k, v);
+      }
+      if (text !== null) el.textContent = text;
+      return el;
+    }
+
+    // Definición de puntas de flecha reutilizables en cualquier SVG
+    function appendArrowDefs(svg, prefix) {
+      const defs = svgEl("defs");
+      const colors = [
+        { id: `${prefix}-arrow-blue`, color: "#2563EB" },
+        { id: `${prefix}-arrow-green`, color: "#059669" },
+        { id: `${prefix}-arrow-orange`, color: "#EA580C" },
+        { id: `${prefix}-arrow-purple`, color: "#7C3AED" },
+        { id: `${prefix}-arrow-slate`, color: "#64748B" }
+      ];
+      colors.forEach(({ id, color }) => {
+        const marker = svgEl("marker", {
+          id,
+          viewBox: "0 0 10 10",
+          refX: "8",
+          refY: "5",
+          markerWidth: "7",
+          markerHeight: "7",
+          orient: "auto-start-reverse"
+        });
+        marker.appendChild(svgEl("path", { d: "M 0 1.2 L 10 5 L 0 8.8 z", fill: color }));
+        defs.appendChild(marker);
+      });
+      svg.appendChild(defs);
+    }
+
+    /* =========================================================================
+       NAVEGACIÓN DE PESTAÑAS
+    ========================================================================= */
+    function switchTab(tabNum) {
+      stopExercisePlayback();
+      [1, 2, 3].forEach((n) => {
+        const panel = document.getElementById(`tab-panel-${n}`);
+        const btn = document.getElementById(`tab-btn-${n}`);
+        if (n === tabNum) {
+          panel.classList.remove("hidden");
+          btn.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-orange-600 text-white shadow-sm";
+          btn.setAttribute("aria-selected", "true");
+        } else {
+          panel.classList.add("hidden");
+          btn.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200";
+          btn.setAttribute("aria-selected", "false");
+        }
+      });
+      if (tabNum === 1) renderCompassSVG(false);
+      if (tabNum === 2) renderExerciseView();
+    }
+
+    /* =========================================================================
+       PESTAÑA 1: BRÚJULA ¿ADELANTE O ATRÁS?
+    ========================================================================= */
+    const compassState = {
+      flow: "deferred", // single | ordinary | due | deferred
+      mode: "vp",       // vp | vf
+      ff: 0,            // 0..10
+      phase: 2          // 0 = idle, 1 = phase 1, 2 = phase 1+2
+    };
+
+    let compassTimers = [];
+
+    const FLOW_CONFIGS = {
+      single: {
+        name: "Flujo Único ($1,000 en t = 5)",
+        payments: [5],
+        amountLabel: "$1,000",
+        supportsMode: false,
+        dropPoint: () => 5,
+        phase1Text: "Solo hay un flujo en t = 5, así que no hace falta agrupar pagos.",
+        formulaBase: () => "1,000"
+      },
+      ordinary: {
+        name: "Anualidad Vencida (pagos en t = 1..5)",
+        payments: [1, 2, 3, 4, 5],
+        amountLabel: "R",
+        supportsMode: true,
+        dropPoint: (mode) => (mode === "vp" ? 0 : 5),
+        phase1Text: (mode) =>
+          mode === "vp"
+            ? "a_5|i agrupa los 5 pagos y SIEMPRE cae 1 periodo ANTES del primer pago → cae en t = 0."
+            : "s_5|i agrupa los 5 pagos y SIEMPRE cae EN el último pago → cae en t = 5.",
+        formulaBase: (mode) => (mode === "vp" ? `R · ${mathA(5, "i")}` : `R · ${mathS(5, "i")}`)
+      },
+      due: {
+        name: "Anualidad Anticipada (pagos en t = 0..4)",
+        payments: [0, 1, 2, 3, 4],
+        amountLabel: "R",
+        supportsMode: true,
+        dropPoint: (mode) => (mode === "vp" ? 0 : 5),
+        phase1Text: (mode) =>
+          mode === "vp"
+            ? "ä_5|i agrupa los 5 pagos y SIEMPRE cae EN el primer pago → cae en t = 0."
+            : "s̈_5|i agrupa los 5 pagos y SIEMPRE cae 1 periodo DESPUÉS del último pago → cae en t = 5.",
+        formulaBase: (mode) => (mode === "vp" ? `R · ${mathADue(5, "i")}` : `R · ${mathSDue(5, "i")}`)
+      },
+      deferred: {
+        name: "Anualidad Diferida (pagos en t = 4..8)",
+        payments: [4, 5, 6, 7, 8],
+        amountLabel: "R",
+        supportsMode: true,
+        dropPoint: (mode) => (mode === "vp" ? 3 : 8),
+        phase1Text: (mode) =>
+          mode === "vp"
+            ? "a_5|i agrupa los pagos (t=4..8) y SIEMPRE cae 1 periodo ANTES del primer pago → cae en t = 3 (¡no en 0!)."
+            : "s_5|i agrupa los pagos (t=4..8) y SIEMPRE cae EN el último pago → cae en t = 8.",
+        formulaBase: (mode) => (mode === "vp" ? `R · ${mathA(5, "i")}` : `R · ${mathS(5, "i")}`)
+      }
+    };
+
+    function clearCompassTimers() {
+      compassTimers.forEach((t) => clearTimeout(t));
+      compassTimers = [];
+    }
+
+    function setCompassFlow(flowKey) {
+      compassState.flow = flowKey;
+      updateCompassButtons();
+      runCompassAnimation();
+    }
+
+    function setCompassFormulaMode(mode) {
+      compassState.mode = mode;
+      updateCompassButtons();
+      runCompassAnimation();
+    }
+
+    function setCompassFF(ff) {
+      compassState.ff = ff;
+      document.getElementById("ff-slider").value = ff;
+      document.getElementById("ff-badge").textContent = `t = ${ff}`;
+      runCompassAnimation();
+    }
+
+    function updateCompassButtons() {
+      const cfg = FLOW_CONFIGS[compassState.flow];
+      document.querySelectorAll(".flow-opt").forEach((btn) => {
+        const active = btn.dataset.flow === compassState.flow;
+        btn.className = active
+          ? "flow-opt text-left px-3 py-2.5 rounded-xl border-2 border-orange-500 bg-orange-50 text-orange-900 text-xs sm:text-sm font-bold transition-all shadow-sm"
+          : "flow-opt text-left px-3 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-all";
+      });
+
+      const vpBtn = document.getElementById("compass-mode-vp");
+      const vfBtn = document.getElementById("compass-mode-vf");
+      if (!cfg.supportsMode) {
+        vpBtn.disabled = true;
+        vfBtn.disabled = true;
+        vpBtn.className = "px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-xs sm:text-sm font-semibold text-left cursor-not-allowed";
+        vfBtn.className = "px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-xs sm:text-sm font-semibold text-left cursor-not-allowed";
+      } else {
+        vpBtn.disabled = false;
+        vfBtn.disabled = false;
+        vpBtn.className =
+          compassState.mode === "vp"
+            ? "px-3 py-2.5 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-900 text-xs sm:text-sm font-bold text-left transition-all shadow-sm"
+            : "px-3 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold text-left transition-all";
+        vfBtn.className =
+          compassState.mode === "vf"
+            ? "px-3 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-xs sm:text-sm font-bold text-left transition-all shadow-sm"
+            : "px-3 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold text-left transition-all";
+      }
+    }
+
+    function runCompassAnimation() {
+      clearCompassTimers();
+      compassState.phase = 1;
+      renderCompassSVG(true);
+      updateCompassPhasePills(1);
+      renderCompassExplanation();
+
+      const t1 = setTimeout(() => {
+        compassState.phase = 2;
+        renderCompassSVG(true);
+        updateCompassPhasePills(2);
+      }, 900);
+      compassTimers.push(t1);
+    }
+
+    function updateCompassPhasePills(phase) {
+      const p1 = document.getElementById("phase-pill-1");
+      const p2 = document.getElementById("phase-pill-2");
+      const cfg = FLOW_CONFIGS[compassState.flow];
+      const drop = cfg.dropPoint(compassState.mode);
+      const diff = compassState.ff - drop;
+
+      if (phase >= 1) {
+        p1.className = "px-3 py-1 rounded-full bg-slate-800 text-white transition-all shadow-sm";
+      } else {
+        p1.className = "px-3 py-1 rounded-full bg-slate-200 text-slate-600 transition-all";
+      }
+
+      if (phase >= 2) {
+        if (diff < 0) {
+          p2.className = "px-3 py-1 rounded-full bg-blue-600 text-white transition-all shadow-sm";
+        } else if (diff > 0) {
+          p2.className = "px-3 py-1 rounded-full bg-emerald-600 text-white transition-all shadow-sm";
+        } else {
+          p2.className = "px-3 py-1 rounded-full bg-orange-600 text-white transition-all shadow-sm";
+        }
+      } else {
+        p2.className = "px-3 py-1 rounded-full bg-slate-200 text-slate-600 transition-all";
+      }
+    }
+
+    function renderCompassSVG(animate) {
+      const svg = document.getElementById("compass-svg");
+      svg.innerHTML = "";
+      appendArrowDefs(svg, "cmp");
+
+      const cfg = FLOW_CONFIGS[compassState.flow];
+      const drop = cfg.dropPoint(compassState.mode);
+      const ff = compassState.ff;
+      const diff = ff - drop;
+
+      const xStart = 60;
+      const xEnd = 860;
+      const stepX = (xEnd - xStart) / 10;
+      const axisY = 185;
+      const xAt = (t) => xStart + t * stepX;
+
+      // Hint en barra superior
+      const hintEl = document.getElementById("compass-pin-hint");
+      if (cfg.supportsMode) {
+        hintEl.textContent = `Pin de fórmula en t = ${drop} | Fecha Focal en t = ${ff}`;
+      } else {
+        hintEl.textContent = `Flujo único en t = 5 | Fecha Focal en t = ${ff}`;
+      }
+
+      // Eje horizontal
+      svg.appendChild(svgEl("line", {
+        x1: xStart - 20, y1: axisY, x2: xEnd + 20, y2: axisY,
+        stroke: "#94A3B8", "stroke-width": 3, "stroke-linecap": "round"
+      }));
+
+      // Resaltado zona de gracia en diferida
+      if (compassState.flow === "deferred") {
+        svg.appendChild(svgEl("rect", {
+          x: xAt(0), y: axisY - 12, width: xAt(3) - xAt(0), height: 24,
+          rx: 6, fill: "#F1F5F9", stroke: "#CBD5E1", "stroke-dasharray": "4 3"
+        }));
+        svg.appendChild(svgEl("text", {
+          x: (xAt(0) + xAt(3)) / 2, y: axisY + 4,
+          "text-anchor": "middle", "font-size": 10.5, "font-weight": "700", fill: "#64748B"
+        }, "Meses sin pago"));
+      }
+
+      // Marcas t = 0..10 clicables para mover Fecha Focal
+      for (let t = 0; t <= 10; t++) {
+        const x = xAt(t);
+        const isFF = t === ff;
+        const g = svgEl("g", { class: "cursor-pointer" });
+        g.addEventListener("click", () => setCompassFF(t));
+
+        // Área invisible cómoda para tocar
+        g.appendChild(svgEl("rect", {
+          x: x - 22, y: axisY - 20, width: 44, height: 64, fill: "transparent"
+        }));
+
+        g.appendChild(svgEl("line", {
+          x1: x, y1: axisY - 8, x2: x, y2: axisY + 8,
+          stroke: isFF ? "#EA580C" : "#64748B", "stroke-width": isFF ? 3.5 : 2
+        }));
+
+        // Etiqueta clicable
+        if (isFF) {
+          g.appendChild(svgEl("rect", {
+            x: x - 22, y: axisY + 14, width: 44, height: 24, rx: 8,
+            fill: "#EA580C"
+          }));
+          g.appendChild(svgEl("text", {
+            x, y: axisY + 30, "text-anchor": "middle", "font-size": 12, "font-weight": "800", fill: "#FFFFFF"
+          }, `t=${t}`));
+        } else {
+          g.appendChild(svgEl("text", {
+            x, y: axisY + 30, "text-anchor": "middle", "font-size": 12, "font-weight": "600", fill: "#475569"
+          }, `t=${t}`));
+        }
+        svg.appendChild(g);
+      }
+
+      // Línea vertical de Fecha Focal (FF)
+      const xFF = xAt(ff);
+      svg.appendChild(svgEl("line", {
+        x1: xFF, y1: 30, x2: xFF, y2: axisY + 12,
+        stroke: "#EA580C", "stroke-width": 2.5, "stroke-dasharray": "6 4"
+      }));
+      svg.appendChild(svgEl("rect", {
+        x: xFF - 46, y: 10, width: 92, height: 24, rx: 12, fill: "#EA580C"
+      }));
+      svg.appendChild(svgEl("text", {
+        x: xFF, y: 26, "text-anchor": "middle", "font-size": 11.5, "font-weight": "800", fill: "#FFFFFF"
+      }, `FECHA FOCAL`));
+
+      // Dibujar los pagos en la línea de tiempo (hacia abajo desde el eje o círculos arriba)
+      cfg.payments.forEach((p) => {
+        const x = xAt(p);
+        svg.appendChild(svgEl("line", {
+          x1: x, y1: axisY, x2: x, y2: axisY + 62,
+          stroke: "#334155", "stroke-width": 2.5, "marker-end": "url(#cmp-arrow-slate)"
+        }));
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: axisY, r: 5.5, fill: "#0F172A", stroke: "#FFFFFF", "stroke-width": 2
+        }));
+        svg.appendChild(svgEl("text", {
+          x, y: axisY + 80, "text-anchor": "middle", "font-size": 12, "font-weight": "700", fill: "#1E293B"
+        }, cfg.amountLabel));
+      });
+
+      // FASE 1: Agrupación de la anualidad hacia su punto de caída (drop)
+      if (compassState.phase >= 1 && cfg.supportsMode) {
+        const pFirst = cfg.payments[0];
+        const pLast = cfg.payments[cfg.payments.length - 1];
+        const isVP = compassState.mode === "vp";
+        const groupColor = isVP ? "#2563EB" : "#059669";
+        const marker = isVP ? "url(#cmp-arrow-blue)" : "url(#cmp-arrow-green)";
+
+        // Llave / caja de agrupación sobre los pagos
+        const x1 = xAt(pFirst) - 10;
+        const x2 = xAt(pLast) + 10;
+        svg.appendChild(svgEl("rect", {
+          x: x1, y: axisY + 46, width: x2 - x1, height: 46, rx: 10,
+          fill: isVP ? "rgba(37,99,235,0.08)" : "rgba(5,150,105,0.08)",
+          stroke: groupColor, "stroke-width": 1.8, "stroke-dasharray": "5 3"
+        }));
+
+        // Curvas sutiles desde los extremos hacia el punto de caída
+        const xDrop = xAt(drop);
+        const startX = isVP ? xAt(pLast) : xAt(pFirst);
+        const midX = (startX + xDrop) / 2;
+        const curveY = axisY - 46;
+        svg.appendChild(svgEl("path", {
+          d: `M ${startX} ${axisY - 8} Q ${midX} ${curveY} ${xDrop} ${axisY - 12}`,
+          fill: "none",
+          stroke: groupColor,
+          "stroke-width": 2.6,
+          "stroke-dasharray": "5 4",
+          "marker-end": marker,
+          class: animate ? "animate-draw" : ""
+        }));
+
+        // Pin brillante donde cae la fórmula
+        svg.appendChild(svgEl("circle", {
+          cx: xDrop, cy: axisY, r: 15,
+          fill: isVP ? "rgba(37,99,235,0.22)" : "rgba(5,150,105,0.22)",
+          class: "pin-pulse"
+        }));
+        svg.appendChild(svgEl("circle", {
+          cx: xDrop, cy: axisY, r: 8,
+          fill: groupColor, stroke: "#FFFFFF", "stroke-width": 2.5
+        }));
+
+        // Etiqueta del pin
+        const pinLabel =
+          compassState.flow === "due"
+            ? isVP ? "ä cae aquí" : "s̈ cae aquí"
+            : isVP ? "a cae aquí" : "s cae aquí";
+        svg.appendChild(svgEl("rect", {
+          x: xDrop - 42, y: axisY - 40, width: 84, height: 22, rx: 11, fill: groupColor
+        }));
+        svg.appendChild(svgEl("text", {
+          x: xDrop, y: axisY - 25, "text-anchor": "middle", "font-size": 11, "font-weight": "800", fill: "#FFFFFF"
+        }, pinLabel));
+      }
+
+      // Si es flujo único, también marcamos su pin en t=5
+      if (compassState.phase >= 1 && !cfg.supportsMode) {
+        const xDrop = xAt(5);
+        svg.appendChild(svgEl("circle", {
+          cx: xDrop, cy: axisY, r: 13, fill: "rgba(15,23,42,0.12)", class: "pin-pulse"
+        }));
+        svg.appendChild(svgEl("circle", {
+          cx: xDrop, cy: axisY, r: 7, fill: "#0F172A", stroke: "#FFFFFF", "stroke-width": 2
+        }));
+      }
+
+      // FASE 2: Traslado desde el punto de caída (drop) hasta la Fecha Focal (ff)
+      if (compassState.phase >= 2) {
+        const xDrop = xAt(drop);
+        if (diff === 0) {
+          // Ya está en la Fecha Focal
+          svg.appendChild(svgEl("rect", {
+            x: xFF - 106, y: 52, width: 212, height: 34, rx: 12,
+            fill: "#FFF7ED", stroke: "#EA580C", "stroke-width": 2
+          }));
+          svg.appendChild(svgEl("text", {
+            x: xFF, y: 73, "text-anchor": "middle", "font-size": 12.5, "font-weight": "800", fill: "#C2410C"
+          }, "¡Ya estás en la Fecha Focal! (k = 0)"));
+        } else {
+          const isBack = diff < 0;
+          const k = Math.abs(diff);
+          const color = isBack ? "#2563EB" : "#059669";
+          const marker = isBack ? "url(#cmp-arrow-blue)" : "url(#cmp-arrow-green)";
+          const midX = (xDrop + xFF) / 2;
+          const arcTopY = 58;
+
+          const pathD = `M ${xDrop} ${axisY - 14} C ${xDrop} ${arcTopY}, ${xFF} ${arcTopY}, ${xFF} ${axisY - 14}`;
+          const arcPath = svgEl("path", {
+            d: pathD,
+            fill: "none",
+            stroke: color,
+            "stroke-width": 4,
+            "marker-end": marker,
+            class: animate ? "animate-draw" : ""
+          });
+          svg.appendChild(arcPath);
+
+          // Partícula viajando sobre la flecha (animación SMIL nativa sin librerías)
+          if (animate) {
+            const dot = svgEl("circle", { r: 5.5, fill: color, stroke: "#FFFFFF", "stroke-width": 1.8 });
+            const animMotion = svgEl("animateMotion", {
+              dur: "1.1s",
+              repeatCount: "1",
+              fill: "freeze",
+              path: pathD
+            });
+            dot.appendChild(animMotion);
+            svg.appendChild(dot);
+          }
+
+          // Etiqueta de factor sobre la curva
+          const badgeText = isBack
+            ? `← ATRÁS ${k} per. · ×(1+i)^-${k}`
+            : `ADELANTE ${k} per. → · ×(1+i)^+${k}`;
+          const badgeW = 205;
+          const bx = Math.max(20, Math.min(900 - badgeW, midX - badgeW / 2));
+          svg.appendChild(svgEl("rect", {
+            x: bx, y: 48, width: badgeW, height: 30, rx: 15,
+            fill: isBack ? "#EFF6FF" : "#ECFDF5", stroke: color, "stroke-width": 2
+          }));
+          svg.appendChild(svgEl("text", {
+            x: bx + badgeW / 2, y: 67, "text-anchor": "middle", "font-size": 12, "font-weight": "800", fill: color
+          }, badgeText));
+        }
+      }
+    }
+
+    function renderCompassExplanation() {
+      const box = document.getElementById("compass-explanation");
+      const cfg = FLOW_CONFIGS[compassState.flow];
+      const drop = cfg.dropPoint(compassState.mode);
+      const ff = compassState.ff;
+      const diff = ff - drop;
+      const k = Math.abs(diff);
+
+      const baseFormula = cfg.formulaBase(compassState.mode);
+      let moveFormula = "";
+      let dirBadge = "";
+      let explanationText = "";
+
+      if (diff === 0) {
+        moveFormula = `<span class="text-orange-600 font-bold">(sin factor extra, k = 0)</span>`;
+        dirBadge = `<span class="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-extrabold">Mismo punto · Sin traslado</span>`;
+        explanationText = `Tu fórmula ya te dejó exactamente en <strong>t = ${ff}</strong>, que coincide con tu Fecha Focal. No necesitas multiplicar por (1+i)<sup>±k</sup>.`;
+      } else if (diff < 0) {
+        moveFormula = `· <span class="text-blue-600 font-extrabold">(1 + i)<sup>−${k}</sup></span>`;
+        dirBadge = `<span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-extrabold">← Mover hacia ATRÁS (Quitar interés / Valor Presente)</span>`;
+        explanationText = `La Fecha Focal (<strong>t = ${ff}</strong>) está <strong>${k} periodo${k > 1 ? "s" : ""} a la izquierda</strong> de donde cayó tu bloque (<strong>t = ${drop}</strong>). Para regresar dinero en el tiempo siempre <strong>descuentas</strong> multiplicando por <span class="font-bold text-blue-700">(1 + i)<sup>−${k}</sup></span>.`;
+      } else {
+        moveFormula = `· <span class="text-emerald-600 font-extrabold">(1 + i)<sup>+${k}</sup></span>`;
+        dirBadge = `<span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">Mover hacia ADELANTE → (Sumar interés / Valor Futuro)</span>`;
+        explanationText = `La Fecha Focal (<strong>t = ${ff}</strong>) está <strong>${k} periodo${k > 1 ? "s" : ""} a la derecha</strong> de donde cayó tu bloque (<strong>t = ${drop}</strong>). Para avanzar dinero en el tiempo siempre <strong>capitalizas</strong> multiplicando por <span class="font-bold text-emerald-700">(1 + i)<sup>+${k}</sup></span>.`;
+      }
+
+      const phase1Desc = typeof cfg.phase1Text === "function" ? cfg.phase1Text(compassState.mode) : cfg.phase1Text;
+
+      box.innerHTML = `
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-2 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Fórmula resultante en FF = ${ff}</span>
+              ${dirBadge}
+            </div>
+            <div class="text-xl sm:text-2xl font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 inline-block">
+              Valor<sub>FF=${ff}</sub> = ${baseFormula} ${moveFormula}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-sm text-slate-700">
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <p class="text-xs font-extrabold text-slate-500 uppercase mb-1">Paso 1 · ¿Dónde cae la fórmula?</p>
+                <p>${phase1Desc}</p>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <p class="text-xs font-extrabold text-slate-500 uppercase mb-1">Paso 2 · ¿Hacia dónde muevo el resultado?</p>
+                <p>${explanationText}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       PESTAÑA 2: TUS 8 EJERCICIOS PASO A PASO (MÉTODO EXACTO DE TUS NOTAS)
+    ========================================================================= */
+    const EXERCISES = [
+      {
+        id: 1,
+        group: 1,
+        shortTitle: "Ej. 1 · Deuda diferida ($450 × 6)",
+        category: "Anualidad Diferida",
+        catStyle: "bg-blue-100 text-blue-800",
+        title: "Ejercicio 1: Valor de una deuda con pagos diferidos",
+        statement: "Una deuda debe ser pagada con 6 pagos fijos de $450 cada mes, siendo que el primer pago lo efectúas a los 4 meses. Si la tasa de interés mensual es del 3%, ¿de cuánto fue el valor de la deuda?",
+        result: "VP = $2,230.87",
+        dataPills: ["R = $450/mes", "n = 6 pagos", "1er pago: t = 4", "i = 3% mensual", "Incógnita: Deuda en t = 0"],
+        steps: [
+          {
+            heading: "Paso 1: Dibuja la línea de tiempo y ubica los pagos",
+            text: "Los meses 1, 2 y 3 están vacíos (periodo de gracia). Como son 6 pagos mensuales empezando en el mes 4, los pagos caen en t = 4, 5, 6, 7, 8 y 9."
+          },
+          {
+            heading: "Paso 2: Fija la Fecha Focal en t = 0",
+            text: "Buscamos el valor de la deuda HOY (t = 0). Por convención de tus notas, colocamos la Fecha Focal en t = 0."
+          },
+          {
+            heading: "Paso 3: Agrupa con a_6|0.03 y descuenta 3 meses atrás",
+            text: "Primero agrupas los 6 pagos con anualidad vencida a_6|0.03: ¡recuerda que cae 1 mes ANTES del primer pago, o sea en t = 3! Luego mueves ese bloque 3 meses hacia ATRÁS (azul) hasta t = 0 con (1.03)^-3."
+          },
+          {
+            heading: "Paso 4: Ecuación de valor y resultado final",
+            text: "Evaluamos el bloque en t = 3 ($2,437.74) y le quitamos 3 meses de interés para llegar a $2,230.87 en t = 0."
+          }
+        ],
+        note: {
+          style: "bg-blue-50 border border-blue-200 text-blue-900",
+          html: "<strong>Clave para no fallar:</strong> Aunque el primer pago es en el mes 4, el factor de descuento es <strong>(1.03)<sup>−3</sup></strong> y NO −4, porque <strong>a<sub>6|3%</sub></strong> ya te recorrió 1 mes atrás (del mes 4 al mes 3)."
+        },
+        mathSteps: [
+          `<strong>Ecuación en FF = 0:</strong> &nbsp; D = 450 · ${mathA(6, "0.03")} · <span class="text-blue-700 font-bold">(1.03)<sup>−3</sup></span>`,
+          `<strong>1) Bloque en t = 3:</strong> &nbsp; VP<sub>3</sub> = 450 · ${frac("1 − (1.03)<sup>−6</sup>", "0.03")} = 450 · (5.417191) = <strong>$2,437.74</strong>`,
+          `<strong>2) Regresar 3 meses a t = 0:</strong> &nbsp; D = 2,437.736 · (1.03)<sup>−3</sup> = 2,437.736 · (0.915142)`,
+          `<strong class="text-emerald-700 text-base">Resultado final: D = $2,230.87</strong>`
+        ]
+      },
+      {
+        id: 2,
+        group: 1,
+        shortTitle: "Ej. 2 · Préstamo trimestral ($50,000)",
+        category: "Anualidad Diferida · FF Intercambiable",
+        catStyle: "bg-blue-100 text-blue-800",
+        title: "Ejercicio 2: Valor de pagos trimestrales diferidos",
+        statement: "El día de hoy se otorga un préstamo por $50,000 que será pagado de forma trimestral durante 2 años, pero el primer pago lo realizará al año. Si la tasa es del 16% convertible trimestralmente, ¿cuál es el valor de los pagos?",
+        result: "R = $8,353.68",
+        dataPills: ["D = $50,000 en t = 0", "n = 8 trimestres (2 años)", "1er pago: t = 4 trim.", "i = 16%/4 = 4% trim.", "Incógnita: Pago R"],
+        variants: {
+          label: "Cambia la Fecha Focal y comprueba",
+          options: [
+            { id: "ff3", label: "Fecha Focal = 3 (más limpia)" },
+            { id: "ff0", label: "Fecha Focal = 0 (todo atrás)" }
+          ]
+        },
+        getDynamic: (variant) => {
+          if (variant === "ff0") {
+            return {
+              steps: [
+                {
+                  heading: "Paso 1: Dibuja la línea de tiempo en TRIMESTRES",
+                  text: "Como los pagos y la capitalización son trimestrales, trabajamos en trimestres: la deuda de $50,000 está en t = 0 y los 8 pagos R están en t = 4, 5, 6, 7, 8, 9, 10 y 11."
+                },
+                {
+                  heading: "Paso 2: Fecha Focal en t = 0",
+                  text: "Elegimos FF = 0. La deuda de $50,000 ya está parada en t = 0, así que no se mueve."
+                },
+                {
+                  heading: "Paso 3: Trae los 8 pagos hacia ATRÁS en 2 brincos",
+                  text: "Primero a_8|0.04 agrupa los 8 pagos y cae en t = 3. Luego, como nuestra FF está en t = 0, descontamos 3 trimestres hacia ATRÁS (azul) con (1.04)^-3."
+                },
+                {
+                  heading: "Paso 4: Despeja R (mismo resultado exacto)",
+                  text: "Dividimos $50,000 entre el factor total descontado (5.98539) y obtenemos R = $8,353.68."
+                }
+              ],
+              note: {
+                style: "bg-orange-50 border border-orange-200 text-orange-900",
+                html: "<strong>¡Magia del interés compuesto!</strong> Cambia el botón naranja de arriba entre <strong>FF = 3</strong> y <strong>FF = 0</strong>: las flechas cambian de dirección, pero en interés compuesto el pago <strong>R = $8,353.68</strong> es exactamente el mismo."
+              },
+              mathSteps: [
+                `<strong>Ecuación en FF = 0:</strong> &nbsp; 50,000 = R · ${mathA(8, "0.04")} · <span class="text-blue-700 font-bold">(1.04)<sup>−3</sup></span>`,
+                `<strong>1) Factor anualidad:</strong> &nbsp; ${mathA(8, "0.04")} = ${frac("1 − (1.04)<sup>−8</sup>", "0.04")} = 6.732745`,
+                `<strong>2) Factor total en t = 0:</strong> &nbsp; 6.732745 · (1.04)<sup>−3</sup> = 6.732745 · (0.888996) = 5.985386`,
+                `<strong class="text-emerald-700 text-base">Despeje: R = 50,000 / 5.985386 = $8,353.68</strong>`
+              ]
+            };
+          }
+          return {
+            steps: [
+              {
+                heading: "Paso 1: Dibuja la línea de tiempo en TRIMESTRES",
+                text: "Convertimos todo a trimestres: tasa i = 16%/4 = 4% trimestral. La deuda de $50,000 está en t = 0 y los 8 pagos R ocurren en los trimestres t = 4, 5, 6, 7, 8, 9, 10 y 11."
+              },
+              {
+                heading: "Paso 2: Fecha Focal en t = 3 (donde cae a_8|0.04)",
+                text: "Truco pro: poner la FF exactamente en t = 3 te ahorra multiplicar la anualidad por un factor extra."
+              },
+              {
+                heading: "Paso 3: Deuda hacia ADELANTE (verde) y pagos hacia ATRÁS (azul)",
+                text: "Llevas $50,000 desde t = 0 hasta t = 3 multiplicando por (1.04)^+3 (verde). Los 8 pagos se agrupan con a_8|0.04 y caen directo en t = 3."
+              },
+              {
+                heading: "Paso 4: Iguala en t = 3 y despeja R",
+                text: "La deuda creció a $56,243.20 en t = 3. Dividimos entre 6.732745 y obtenemos R = $8,353.68."
+              }
+            ],
+            note: {
+              style: "bg-orange-50 border border-orange-200 text-orange-900",
+              html: "<strong>Prueba el interruptor de arriba:</strong> Cambia a <strong>Fecha Focal = 0</strong> y mira cómo la flecha verde de los $50,000 desaparece y se convierte en una flecha azul en los pagos, ¡dando el mismo $8,353.68!"
+            },
+            mathSteps: [
+              `<strong>Ecuación en FF = 3:</strong> &nbsp; 50,000<span class="text-emerald-700 font-bold">(1.04)<sup>+3</sup></span> = R · ${mathA(8, "0.04")}`,
+              `<strong>1) Deuda en t = 3:</strong> &nbsp; 50,000 · (1.124864) = <strong>$56,243.20</strong>`,
+              `<strong>2) Factor anualidad:</strong> &nbsp; ${mathA(8, "0.04")} = ${frac("1 − (1.04)<sup>−8</sup>", "0.04")} = 6.732745`,
+              `<strong class="text-emerald-700 text-base">Despeje: R = 56,243.20 / 6.732745 = $8,353.68</strong>`
+            ]
+          };
+        }
+      },
+      {
+        id: 3,
+        group: 2,
+        shortTitle: "Ej. 3 · Tiempo n ($56,559.94)",
+        category: "Incógnita: Tiempo (n) · Anticipada",
+        catStyle: "bg-violet-100 text-violet-800",
+        title: "Ejercicio 3: Tiempo necesario para acumular un monto",
+        statement: "Deseas acumular $56,559.94, por lo que vas a hacer depósitos mensuales de $1,300 a una tasa del 1% mensual. Si el dinero se retira un mes después del último depósito, ¿cuánto tiempo necesitarás?",
+        result: "n = 36 meses (3 años)",
+        dataPills: ["Meta M = $56,559.94", "R = $1,300/mes", "i = 1% mensual", "Retiro: 1 mes después", "Incógnita: n"],
+        steps: [
+          {
+            heading: "Paso 1: Ubica los depósitos y el mes extra al final",
+            text: "Haces n depósitos de $1,300. La frase clave «el dinero se retira un mes después del último depósito» significa que el último depósito descansa 1 mes más ganando interés."
+          },
+          {
+            heading: "Paso 2: Fija la Fecha Focal al momento del retiro (t = n)",
+            text: "Como queremos juntar un monto futuro M = $56,559.94, nuestra Fecha Focal está al final del plazo, exactamente en el momento del retiro."
+          },
+          {
+            heading: "Paso 3: Todos los depósitos viajan hacia ADELANTE (verde)",
+            text: "s_n|0.01 deja el acumulado EN el último depósito (t = n − 1). Para llevarlo al retiro (1 mes después), multiplicamos por (1.01)^+1 → eso forma una anualidad anticipada s̈_n|0.01."
+          },
+          {
+            heading: "Paso 4: Despeja (1.01)^n y aplica logaritmos",
+            text: "Aislamos (1.01)^n = 1.430769 (¡justo el 1.4307 de tus notas!) y bajamos el exponente n con ln()."
+          }
+        ],
+        note: {
+          style: "bg-violet-50 border border-violet-200 text-violet-900",
+          html: "<strong>¡Buen trabajo en tus apuntes!</strong> En tu cuaderno ya habías llegado a <strong>1.4307</strong>. Recuerda: cuando el retiro es <em>un mes después del último depósito</em>, siempre aparece ese factor extra <strong>(1 + i)</strong> que convierte s<sub>n|i</sub> en anticipada."
+        },
+        mathSteps: [
+          `<strong>Ecuación en el retiro:</strong> &nbsp; 56,559.94 = 1,300 · ${mathS("n", "0.01")} · <span class="text-emerald-700 font-bold">(1.01)</span>`,
+          `<strong>1) Pasa dividiendo 1,300 × 1.01:</strong> &nbsp; ${frac("56,559.94", "1,313")} = 43.07688 = ${frac("(1.01)<sup>n</sup> − 1", "0.01")}`,
+          `<strong>2) Aísla la potencia:</strong> &nbsp; (1.01)<sup>n</sup> = 0.430769 + 1 = <strong>1.430769</strong> <span class="text-xs text-violet-700">(coincide con tu 1.4307)</span>`,
+          `<strong class="text-emerald-700 text-base">3) Logaritmo: n = ln(1.430769) / ln(1.01) = 36 meses (3 años)</strong>`
+        ]
+      },
+      {
+        id: 4,
+        group: 2,
+        shortTitle: "Ej. 4 · Pago Extra 1 mes después",
+        category: "Incógnita: Pago Extra (en n + 1)",
+        catStyle: "bg-violet-100 text-violet-800",
+        title: "Ejercicio 4: Pago extra un mes después del último pago completo",
+        statement: "Por un adeudo de $79,000 se realizarán pagos mensuales de $3,175, cobrándose una tasa anual convertible mensualmente del 26%. ¿Cuántos pagos completos deben realizarse? ¿Es necesario pago extra? ¿De cuánto si se hace un mes después del último pago completo?",
+        result: "36 pagos completos y X = $436.62 (en t = 37)",
+        dataPills: ["D = $79,000", "R = $3,175/mes", "i = 26%/12 = 2.1667%", "Extra X en t = 37", "n exacto = 36.136"],
+        steps: [
+          {
+            heading: "Paso 1: Calcula n y descubre que sobra un decimal",
+            text: "Al despejar n con 79,000 = 3,175 · a_n|i sale n = 36.136 pagos. Eso significa 36 pagos completos de $3,175 y SÍ falta un pago extra X en el mes 37 (un mes después del pago 36)."
+          },
+          {
+            heading: "Paso 2: Fija Fecha Focal en t = 0",
+            text: "Comparamos el adeudo original ($79,000 en t = 0) contra todo lo que vamos a pagar (los 36 pagos completos + el pago extra X en t = 37)."
+          },
+          {
+            heading: "Paso 3: Trae los 36 pagos y X hacia ATRÁS a t = 0",
+            text: "a_36|i trae los 36 pagos directo a t = 0 ($78,802.46). El pago extra X está en t = 37, así que regresa 37 meses con (1+i)^-37. El faltante hoy es $197.54."
+          },
+          {
+            heading: "Paso 4: Lleva el faltante 37 meses hacia ADELANTE para hallar X",
+            text: "Para despejar X, multiplicamos el faltante en t = 0 ($197.54) por (1 + 0.26/12)^+37 (verde) y obtenemos X = $436.62."
+          }
+        ],
+        note: {
+          style: "bg-violet-50 border border-violet-200 text-violet-900",
+          html: "<strong>Fíjate en el exponente:</strong> Como el enunciado dice <em>«un mes después del último pago completo»</em>, X se paga en el <strong>mes 37</strong> (n + 1). Por eso el faltante en t = 0 avanza <strong>37 meses</strong>."
+        },
+        mathSteps: [
+          `<strong>1) Hallar n:</strong> &nbsp; (1+i)<sup>−n</sup> = 1 − ${frac("79,000 · (0.26/12)", "3,175")} = 0.460892 &nbsp;⇒&nbsp; n = <strong>36.136</strong> → <strong>36 completos</strong>`,
+          `<strong>2) Ecuación en FF = 0:</strong> &nbsp; 79,000 = 3,175 · ${mathA(36, "i")} + <span class="text-violet-700 font-bold">X · (1+i)<sup>−37</sup></span>`,
+          `<strong>3) Faltante en t = 0:</strong> &nbsp; 79,000 − 78,802.46 = <strong>$197.5423</strong>`,
+          `<strong class="text-emerald-700 text-base">4) Avanzar al mes 37: X = 197.5423 · (1 + 0.26/12)<sup>+37</sup> = $436.62</strong>`
+        ]
+      },
+      {
+        id: 5,
+        group: 2,
+        shortTitle: "Ej. 5 · Pago Extra EN el último pago",
+        category: "Incógnita: Pago Extra (en n)",
+        catStyle: "bg-violet-100 text-violet-800",
+        title: "Ejercicio 5: Compra con enganche y pago extra al momento del último pago",
+        statement: "Una compra de $130,000 se pagará con un enganche de $45,000 hoy, y mensualidades de $7,300 a una tasa del 1.8% mensual al finalizar el mes. Calcular el número de pagos y la cantidad extra a realizar al momento del último pago completo.",
+        result: "13 pagos completos y X = $1,329.39 (en t = 13)",
+        dataPills: ["Precio: $130,000", "Enganche: $45,000", "Deuda D = $85,000", "R = $7,300/mes", "i = 1.8% mensual", "Extra X en t = 13"],
+        steps: [
+          {
+            heading: "Paso 1: Resta el enganche y encuentra n",
+            text: "Primero restamos el enganche que se paga hoy: D = 130,000 − 45,000 = $85,000. Al despejar n obtenemos n = 13.184 pagos → son 13 pagos completos."
+          },
+          {
+            heading: "Paso 2: Fija Fecha Focal en t = 0 y ubica X en t = 13",
+            text: "¡Ojo! Aquí el pago extra X ocurre EN EL MISMO MES 13 (al momento del último pago completo), NO en el mes 14."
+          },
+          {
+            heading: "Paso 3: Trae los 13 pagos y X hacia ATRÁS a t = 0",
+            text: "Los 13 pagos valen $83,945.78 hoy (t = 0). El pago extra X en t = 13 regresa solo 13 meses con (1.018)^-13. El faltante hoy es $1,054.22."
+          },
+          {
+            heading: "Paso 4: Avanza el faltante 13 meses para hallar X",
+            text: "Multiplicamos el faltante ($1,054.22) por (1.018)^+13 (verde) y obtenemos X = $1,329.39 (si te pidieran el cheque total del mes 13, sería 7,300 + 1,329.39 = $8,629.39)."
+          }
+        ],
+        note: {
+          style: "bg-amber-50 border border-amber-300 text-amber-900",
+          html: "<strong>Revisa tu apunte de clase:</strong> En tu hoja aparece el paso correcto <code>0.20958</code>, pero al final del escaneo quedó un número cercano a <code>14.07</code>. Con i = 1.8% el valor exacto es <strong>n = 13.184</strong> (13 completos) y tu resultado final <strong>X = $1,329.39</strong> sí coincide perfecto."
+        },
+        mathSteps: [
+          `<strong>1) Deuda financiada:</strong> &nbsp; D = 130,000 − 45,000 = <strong>$85,000</strong>`,
+          `<strong>2) Hallar n:</strong> &nbsp; (1.018)<sup>−n</sup> = 1 − 0.209589 = 0.790411 &nbsp;⇒&nbsp; n = ${frac("0.235202", "0.017840")} = <strong>13.184</strong> (13 pagos)`,
+          `<strong>3) Ecuación en FF = 0:</strong> &nbsp; 85,000 = 7,300 · ${mathA(13, "0.018")} + <span class="text-violet-700 font-bold">X · (1.018)<sup>−13</sup></span>`,
+          `<strong class="text-emerald-700 text-base">4) Despeje: X = (85,000 − 83,945.78) · (1.018)<sup>+13</sup> = 1,054.22 · 1.261018 = $1,329.39</strong>`
+        ]
+      },
+      {
+        id: 6,
+        group: 3,
+        shortTitle: "Ej. 6 · Saldo a los 3 años (2 métodos)",
+        category: "Saldo Insoluto · Prospectivo vs Retrospectivo",
+        catStyle: "bg-emerald-100 text-emerald-800",
+        title: "Ejercicio 6: Saldo insoluto al cabo de 3 años (ambos métodos)",
+        statement: "Una deuda de $200,000 se pactó pagar con 120 pagos mensuales a una tasa del 30% convertible mensualmente. ¿Cuál es el saldo insoluto al cabo de 3 años?",
+        result: "SI₃₆ = $184,393.47",
+        dataPills: ["D = $200,000", "n = 120 meses", "i = 30%/12 = 2.5% mes", "R = $5,272.36", "Corte: k = 36 (3 años)", "Faltan: 84 pagos"],
+        variants: {
+          label: "Compara ambos métodos en vivo",
+          options: [
+            { id: "prosp", label: "Prospectivo (84 pagos → atrás)" },
+            { id: "retro", label: "Retrospectivo (D y 36 pagos → adelante)" }
+          ]
+        },
+        getDynamic: (variant) => {
+          if (variant === "retro") {
+            return {
+              steps: [
+                {
+                  heading: "Paso 1: Primero hallamos R y marcamos el corte en t = 36",
+                  text: "De 200,000 = R · a_120|0.025 sale R = $5,272.359. Al cabo de 3 años ya hiciste k = 36 pagos."
+                },
+                {
+                  heading: "Paso 2: Fecha Focal en el corte (t = 36)",
+                  text: "Todo saldo insoluto se evalúa exactamente en el momento del corte: Fecha Focal = 36."
+                },
+                {
+                  heading: "Paso 3 (Retrospectivo): Mira hacia el PASADO y avanza a t = 36 (verde)",
+                  text: "Llevas la deuda original ($200,000) 36 meses hacia ADELANTE → $486,507.04. Y llevas los 36 pagos ya hechos hacia ADELANTE con s_36|0.025 → $302,113.57."
+                },
+                {
+                  heading: "Paso 4: Resta «Deuda acumulada − Pagos acumulados»",
+                  text: "486,507.04 − 302,113.57 = $184,393.47. ¡Exactamente lo mismo que el método prospectivo!"
+                }
+              ],
+              note: {
+                style: "bg-emerald-50 border border-emerald-200 text-emerald-900",
+                html: "<strong>Regla visual del Retrospectivo:</strong> Todo lo que ya pasó (a la izquierda de t = 36) viaja en <strong>VERDE hacia adelante</strong> hasta llegar a t = 36. Fórmula: <strong>D(1+i)<sup>k</sup> − R·s<sub>k|i</sub></strong>."
+              },
+              mathSteps: [
+                `<strong>0) Pago mensual R:</strong> &nbsp; R = ${frac("200,000", mathA(120, "0.025"))} = ${frac("200,000", "37.933687")} = <strong>$5,272.359</strong>`,
+                `<strong>1) Deuda llevada a t = 36:</strong> &nbsp; 200,000<span class="text-emerald-700 font-bold">(1.025)<sup>36</sup></span> = <strong>$486,507.04</strong>`,
+                `<strong>2) 36 pagos llevados a t = 36:</strong> &nbsp; 5,272.359 · <span class="text-emerald-700 font-bold">${mathS(36, "0.025")}</span> = <strong>$302,113.57</strong>`,
+                `<strong class="text-emerald-700 text-base">3) Saldo insoluto: SI<sub>36</sub> = 486,507.04 − 302,113.57 = $184,393.47</strong>`
+              ]
+            };
+          }
+          return {
+            steps: [
+              {
+                heading: "Paso 1: Primero hallamos R y marcamos el corte en t = 36",
+                text: "Con 200,000 = R · a_120|0.025 obtenemos R = $5,272.359 (igual a tu apunte). Como ya pasaron 36 meses, todavía FALTAN 120 − 36 = 84 pagos (t = 37..120)."
+              },
+              {
+                heading: "Paso 2: Fecha Focal en el corte (t = 36)",
+                text: "Queremos saber cuánto valen HOY (en el mes 36) los pagos que te faltan por hacer."
+              },
+              {
+                heading: "Paso 3 (Prospectivo): Mira al FUTURO y trae los 84 pagos hacia ATRÁS (azul)",
+                text: "Los 84 pagos futuros (del mes 37 al 120) se agrupan con a_84|0.025 y caen EXACTAMENTE un mes antes del pago 37, es decir, justo en t = 36."
+              },
+              {
+                heading: "Paso 4: Multiplica y obtén el saldo insoluto",
+                text: "SI_36 = 5,272.359 · (34.973620) = $184,393.47. ¡Cambia el botón de arriba a Retrospectivo para verificar!"
+              }
+            ],
+            note: {
+              style: "bg-blue-50 border border-blue-200 text-blue-900",
+              html: "<strong>Regla visual del Prospectivo:</strong> Solo miras los pagos que FALTAN (a la derecha de t = 36) y los traes en <strong>AZUL hacia atrás</strong> hasta t = 36. Fórmula: <strong>R · a<sub>n−k|i</sub></strong>."
+            },
+            mathSteps: [
+              `<strong>0) Pago mensual R:</strong> &nbsp; R = ${frac("200,000", mathA(120, "0.025"))} = ${frac("200,000", "37.933687")} = <strong>$5,272.359</strong>`,
+              `<strong>1) Pagos restantes:</strong> &nbsp; n − k = 120 − 36 = <strong>84 pagos futuros</strong> (meses 37 a 120)`,
+              `<strong>2) Traerlos a t = 36:</strong> &nbsp; SI<sub>36</sub> = 5,272.359 · <span class="text-blue-700 font-bold">${mathA(84, "0.025")}</span> = 5,272.359 · (34.973620)`,
+              `<strong class="text-emerald-700 text-base">Resultado final: SI<sub>36</sub> = $184,393.47</strong>`
+            ]
+          };
+        }
+      },
+      {
+        id: 7,
+        group: 3,
+        shortTitle: "Ej. 7 · Trampa «justo antes» del 3°",
+        category: "Saldo Insoluto · Trampa de Examen",
+        catStyle: "bg-violet-100 text-violet-800",
+        title: "Ejercicio 7: Saldo insoluto JUSTO ANTES del tercer pago",
+        statement: "Una deuda se liquidará con 5 pagos anuales de $3,343.80, con una tasa del 20%. Calcular el saldo insoluto justo antes de realizar el tercer pago.",
+        result: "SI₃⁻ = $8,452.38",
+        dataPills: ["n = 5 años", "R = $3,343.80", "i = 20% anual", "NO conocemos D", "Momento: t = 3⁻ (ANTES de pagar)"],
+        steps: [
+          {
+            heading: "Paso 1: Dibuja los 5 pagos y pon una LUPA en t = 3⁻",
+            text: "Los 5 pagos ocurren en t = 1, 2, 3, 4 y 5. Como NO te dan la deuda original D, usamos Prospectivo (mirar los pagos que faltan)."
+          },
+          {
+            heading: "Paso 2: Fecha Focal en t = 3⁻ (un segundo antes de pagar)",
+            text: "Como todavía NO entregas el pago 3, en este instante debes 3 pagos: el pago 3 (hoy mismo), el pago 4 y el pago 5."
+          },
+          {
+            heading: "Paso 3: Evalúa como ANUALIDAD ANTICIPADA (ä_3|0.20)",
+            text: "El pago 3 ya está en t = 3 (no regresa). El pago 4 regresa 1 año y el pago 5 regresa 2 años. Eso es exactamente ä_3|0.20 = a_3|0.20 · (1.20)."
+          },
+          {
+            heading: "Paso 4: Calcula el saldo insoluto",
+            text: "Multiplicamos 3,343.80 · a_3|0.20 = $7,043.65 (ese sería el saldo en t = 2) y lo avanzamos 1 año por (1.20) para llegar a $8,452.38."
+          }
+        ],
+        note: {
+          style: "bg-violet-50 border border-violet-200 text-violet-900",
+          html: "<strong>Trampa clásica de examen:</strong> «Justo <em>después</em> del pago 3» → faltan 2 pagos (vencida <strong>a<sub>2|i</sub></strong>). «Justo <em>antes</em> del pago 3» → faltan 3 pagos incluyendo el de hoy (anticipada <strong>ä<sub>3|i</sub> = a<sub>3|i</sub>(1+i)</strong>)."
+        },
+        mathSteps: [
+          `<strong>Lógica:</strong> En t = 3<sup>−</sup> aún debes el pago 3 (hoy), pago 4 y pago 5 → <strong>3 pagos (anticipada)</strong>`,
+          `<strong>Fórmula:</strong> &nbsp; SI<sub>3<sup>−</sup></sub> = 3,343.80 · <span class="text-violet-700 font-bold">${mathADue(3, "0.20")}</span> = 3,343.80 · ${mathA(3, "0.20")} · (1.20)`,
+          `<strong>Cálculo:</strong> &nbsp; ${mathA(3, "0.20")} = ${frac("1 − (1.20)<sup>−3</sup>", "0.20")} = 2.106481 &nbsp;⇒&nbsp; 3,343.80 · (2.106481) · (1.20)`,
+          `<strong class="text-emerald-700 text-base">Resultado final: SI<sub>3<sup>−</sup></sub> = 7,043.65 · (1.20) = $8,452.38</strong>`
+        ]
+      },
+      {
+        id: 8,
+        group: 3,
+        shortTitle: "Ej. 8 · Retrospectivo obligado ($99,000)",
+        category: "Saldo Insoluto · Retrospectivo",
+        catStyle: "bg-emerald-100 text-emerald-800",
+        title: "Ejercicio 8: Saldo insoluto usando método retrospectivo (sin conocer n)",
+        statement: "Por una mercancía con valor de $99,000 se pacta realizar pagos mensuales de $17,200 a una tasa de 1.2% mensual. Calcular el saldo insoluto una vez que se haya realizado el pago 4, usando método retrospectivo.",
+        result: "SI₄ = $33,789.89",
+        dataPills: ["D = $99,000", "R = $17,200/mes", "i = 1.2% mensual", "k = 4 pagos hechos", "n = ¿? (Desconocido)"],
+        steps: [
+          {
+            heading: "Paso 1: Identifica por qué NO puedes mirar al futuro",
+            text: "El problema NO dice cuántos pagos son en total (n = ¿?). En la línea de tiempo, después de t = 4 todo es signo de interrogación, así que Prospectivo es imposible directamente."
+          },
+          {
+            heading: "Paso 2: Fija Fecha Focal justo después del pago 4 (t = 4)",
+            text: "Usamos Retrospectivo: trabajamos únicamente con lo que SÍ conocemos a la izquierda de t = 4 (la deuda de $99,000 y los 4 pagos de $17,200)."
+          },
+          {
+            heading: "Paso 3: Todo el pasado viaja hacia ADELANTE (verde) hasta t = 4",
+            text: "Avanzamos $99,000 por 4 meses con (1.012)^+4 → $103,838.22. Y acumulamos los 4 pagos con s_4|0.012 → $70,048.34 (cae directo en t = 4)."
+          },
+          {
+            heading: "Paso 4: Resta deuda acumulada menos pagos acumulados",
+            text: "SI_4 = 103,838.22 − 70,048.34 = $33,789.89. ¡Fácil, directo y sin necesidad de calcular n!"
+          }
+        ],
+        note: {
+          style: "bg-emerald-50 border border-emerald-200 text-emerald-900",
+          html: "<strong>Señal de examen:</strong> Si te dan <strong>Deuda (D)</strong> y <strong>Pago (R)</strong>, pero <strong>NO te dan n</strong> (o te piden explícitamente método retrospectivo), ve directo por <strong>D(1+i)<sup>k</sup> − R·s<sub>k|i</sub></strong>."
+        },
+        mathSteps: [
+          `<strong>Fórmula Retrospectiva en t = 4:</strong> &nbsp; SI<sub>4</sub> = 99,000<span class="text-emerald-700 font-bold">(1.012)<sup>4</sup></span> − 17,200 · <span class="text-emerald-700 font-bold">${mathS(4, "0.012")}</span>`,
+          `<strong>1) Deuda acumulada al mes 4:</strong> &nbsp; 99,000 · (1.048871) = <strong>$103,838.22</strong>`,
+          `<strong>2) 4 pagos acumulados al mes 4:</strong> &nbsp; 17,200 · ${frac("(1.012)<sup>4</sup> − 1", "0.012")} = 17,200 · (4.072578) = <strong>$70,048.34</strong>`,
+          `<strong class="text-emerald-700 text-base">3) Resta final: SI<sub>4</sub> = 103,838.22 − 70,048.34 = $33,789.89</strong>`
+        ]
+      }
+    ];
+
+    const exState = {
+      activeId: 1,
+      step: 1,
+      variants: { 2: "ff3", 6: "prosp" },
+      playTimer: null
+    };
+
+    function buildExerciseSelectors() {
+      [1, 2, 3].forEach((g) => {
+        const container = document.getElementById(`ex-group-${g}`);
+        container.innerHTML = "";
+        EXERCISES.filter((e) => e.group === g).forEach((ex) => {
+          const btn = document.createElement("button");
+          btn.id = `ex-btn-${ex.id}`;
+          btn.onclick = () => selectExercise(ex.id);
+          btn.textContent = ex.shortTitle;
+          container.appendChild(btn);
+        });
+      });
+    }
+
+    function selectExercise(id) {
+      stopExercisePlayback();
+      exState.activeId = id;
+      exState.step = 1;
+      renderExerciseView();
+    }
+
+    function setExerciseVariant(exId, variantId) {
+      stopExercisePlayback();
+      exState.variants[exId] = variantId;
+      // Si el usuario cambia variante estando en paso 1 o 2, lo llevamos al paso 3 para ver la magia de las flechas inmediatamente
+      if (exState.step < 3) exState.step = 3;
+      renderExerciseView();
+    }
+
+    function setExerciseStep(step) {
+      stopExercisePlayback();
+      exState.step = Math.max(1, Math.min(4, step));
+      renderExerciseView();
+    }
+
+    function prevExerciseStep() {
+      if (exState.step > 1) setExerciseStep(exState.step - 1);
+    }
+
+    function nextExerciseStep() {
+      if (exState.step < 4) setExerciseStep(exState.step + 1);
+    }
+
+    function stopExercisePlayback() {
+      if (exState.playTimer) {
+        clearInterval(exState.playTimer);
+        exState.playTimer = null;
+      }
+      const btn = document.getElementById("btn-play-ex");
+      if (btn) {
+        btn.innerHTML = `
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+          </svg>
+          Reproducir Animación`;
+      }
+    }
+
+    function playExerciseAnimation() {
+      if (exState.playTimer) {
+        stopExercisePlayback();
+        return;
+      }
+      exState.step = 1;
+      renderExerciseView();
+      const btn = document.getElementById("btn-play-ex");
+      btn.innerHTML = `⏸ Detener`;
+
+      exState.playTimer = setInterval(() => {
+        if (exState.step < 4) {
+          exState.step += 1;
+          renderExerciseView();
+        } else {
+          stopExercisePlayback();
+        }
+      }, 2100);
+    }
+
+    function renderExerciseView() {
+      const ex = EXERCISES.find((e) => e.id === exState.activeId);
+      const variant = exState.variants[ex.id] || null;
+      const dyn = ex.getDynamic ? ex.getDynamic(variant) : ex;
+
+      // Actualizar botones de lista
+      EXERCISES.forEach((item) => {
+        const b = document.getElementById(`ex-btn-${item.id}`);
+        const active = item.id === ex.id;
+        b.className = active
+          ? "w-full text-left px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-900 text-white shadow-sm transition-all"
+          : "w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all";
+      });
+
+      // Cabecera
+      const catBadge = document.getElementById("ex-category-badge");
+      catBadge.className = `px-2.5 py-0.5 rounded-full text-xs font-extrabold ${ex.catStyle}`;
+      catBadge.textContent = ex.category;
+      document.getElementById("ex-result-badge").textContent = `Resultado: ${ex.result}`;
+      document.getElementById("ex-title").textContent = ex.title;
+      document.getElementById("ex-statement").textContent = ex.statement;
+
+      // Pills de datos
+      document.getElementById("ex-data-pills").innerHTML = ex.dataPills
+        .map((p) => `<span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700">${p}</span>`)
+        .join("");
+
+      // Variantes (Ej. 2 y Ej. 6)
+      const varBox = document.getElementById("ex-variant-box");
+      if (ex.variants) {
+        varBox.classList.remove("hidden");
+        document.getElementById("ex-variant-label").textContent = ex.variants.label;
+        document.getElementById("ex-variant-buttons").innerHTML = ex.variants.options
+          .map((opt) => {
+            const isSel = opt.id === variant;
+            const cls = isSel
+              ? "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-orange-600 text-white shadow-sm"
+              : "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-orange-800 border border-orange-200 hover:bg-orange-100";
+            return `<button onclick="setExerciseVariant(${ex.id}, '${opt.id}')" class="${cls}">${opt.label}</button>`;
+          })
+          .join("");
+      } else {
+        varBox.classList.add("hidden");
+      }
+
+      // Pills de pasos 1..4
+      document.querySelectorAll(".ex-step-pill").forEach((pill) => {
+        const s = parseInt(pill.dataset.step);
+        if (s === exState.step) {
+          pill.className = "ex-step-pill px-3 py-2 rounded-xl text-xs font-extrabold bg-orange-600 text-white border border-orange-600 shadow-sm transition-all text-left";
+        } else if (s < exState.step) {
+          pill.className = "ex-step-pill px-3 py-2 rounded-xl text-xs font-bold bg-orange-50 text-orange-800 border border-orange-200 transition-all text-left";
+        } else {
+          pill.className = "ex-step-pill px-3 py-2 rounded-xl text-xs font-semibold bg-white text-slate-500 border border-slate-200 hover:bg-slate-100 transition-all text-left";
+        }
+      });
+
+      document.getElementById("btn-prev-step").disabled = exState.step === 1;
+      document.getElementById("btn-prev-step").classList.toggle("opacity-40", exState.step === 1);
+      document.getElementById("btn-next-step").disabled = exState.step === 4;
+      document.getElementById("btn-next-step").classList.toggle("opacity-40", exState.step === 4);
+
+      // Texto del paso actual
+      const currentStepObj = dyn.steps[exState.step - 1];
+      document.getElementById("ex-step-label").textContent = `Paso ${exState.step} de 4`;
+      document.getElementById("ex-step-heading").textContent = currentStepObj.heading;
+      document.getElementById("ex-step-text").textContent = currentStepObj.text;
+
+      // Nota especial
+      const noteEl = document.getElementById("ex-note-callout");
+      if (dyn.note) {
+        noteEl.className = `rounded-xl p-3.5 text-xs sm:text-sm leading-relaxed ${dyn.note.style}`;
+        noteEl.innerHTML = dyn.note.html;
+      } else {
+        noteEl.className = "hidden";
+      }
+
+      // Desarrollo matemático (se revela progresivamente o resalta el paso activo)
+      const mathContainer = document.getElementById("ex-math-steps");
+      mathContainer.innerHTML = dyn.mathSteps
+        .map((line, idx) => {
+          const isFinalHighlight = exState.step === 4 && idx === dyn.mathSteps.length - 1;
+          const isDimmed = exState.step < 3 && idx > 0;
+          return `<div class="px-3.5 py-2.5 rounded-xl border transition-all ${
+            isFinalHighlight
+              ? "bg-emerald-50 border-emerald-300 shadow-sm"
+              : isDimmed
+              ? "bg-white/60 border-slate-200/70 opacity-50"
+              : "bg-white border-slate-200"
+          }">${line}</div>`;
+        })
+        .join("");
+
+      // Dibujar SVG del ejercicio
+      renderExerciseSVG(ex.id, exState.step, variant);
+    }
+
+    /* =========================================================================
+       MOTOR DE DIAGRAMAS SVG PARA LOS 8 EJERCICIOS
+    ========================================================================= */
+    function renderExerciseSVG(exId, step, variant) {
+      const svg = document.getElementById("exercise-svg");
+      svg.innerHTML = "";
+      appendArrowDefs(svg, "ex");
+
+      const axisY = 188;
+
+      // Helpers internos de dibujo
+      const drawAxis = (x1 = 55, x2 = 865) => {
+        svg.appendChild(svgEl("line", {
+          x1, y1: axisY, x2, y2: axisY,
+          stroke: "#94A3B8", "stroke-width": 3, "stroke-linecap": "round"
+        }));
+      };
+
+      const drawTick = (x, label, isHighlight = false, color = "#475569") => {
+        svg.appendChild(svgEl("line", {
+          x1: x, y1: axisY - 7, x2: x, y2: axisY + 7,
+          stroke: isHighlight ? color : "#64748B", "stroke-width": isHighlight ? 3 : 2
+        }));
+        svg.appendChild(svgEl("text", {
+          x, y: axisY + 25, "text-anchor": "middle",
+          "font-size": 11.5, "font-weight": isHighlight ? "800" : "600",
+          fill: isHighlight ? color : "#475569"
+        }, label));
+      };
+
+      const drawFF = (x, text = "FECHA FOCAL") => {
+        svg.appendChild(svgEl("line", {
+          x1: x, y1: 28, x2: x, y2: axisY + 12,
+          stroke: "#EA580C", "stroke-width": 2.6, "stroke-dasharray": "6 4"
+        }));
+        const w = Math.max(96, text.length * 7.8);
+        const rx = Math.max(12, Math.min(908 - w, x - w / 2));
+        svg.appendChild(svgEl("rect", {
+          x: rx, y: 10, width: w, height: 24, rx: 12, fill: "#EA580C"
+        }));
+        svg.appendChild(svgEl("text", {
+          x: rx + w / 2, y: 26, "text-anchor": "middle", "font-size": 11, "font-weight": "800", fill: "#FFFFFF"
+        }, text));
+      };
+
+      const drawFlowArrow = (x, label, direction = "down", color = "#1E293B", marker = "url(#ex-arrow-slate)") => {
+        if (direction === "down") {
+          svg.appendChild(svgEl("line", {
+            x1: x, y1: axisY + 34, x2: x, y2: axisY + 74,
+            stroke: color, "stroke-width": 2.3, "marker-end": marker
+          }));
+          svg.appendChild(svgEl("text", {
+            x, y: axisY + 92, "text-anchor": "middle", "font-size": 11.5, "font-weight": "700", fill: color
+          }, label));
+        } else {
+          svg.appendChild(svgEl("line", {
+            x1: x, y1: axisY - 58, x2: x, y2: axisY - 10,
+            stroke: color, "stroke-width": 2.6, "marker-end": marker
+          }));
+          svg.appendChild(svgEl("text", {
+            x, y: axisY - 66, "text-anchor": "middle", "font-size": 12, "font-weight": "800", fill: color
+          }, label));
+        }
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: axisY, r: 5, fill: color, stroke: "#FFFFFF", "stroke-width": 1.8
+        }));
+      };
+
+      const drawCurvedMove = (xFrom, xTo, arcY, color, marker, labelText, labelY, delayed = false) => {
+        const d = `M ${xFrom} ${axisY - 12} C ${xFrom} ${arcY}, ${xTo} ${arcY}, ${xTo} ${axisY - 14}`;
+        svg.appendChild(svgEl("path", {
+          d, fill: "none", stroke: color, "stroke-width": 3.5, "marker-end": marker,
+          class: delayed ? "animate-draw-delayed" : "animate-draw"
+        }));
+        const midX = (xFrom + xTo) / 2;
+        const bw = Math.max(130, labelText.length * 7.4);
+        const bx = Math.max(14, Math.min(906 - bw, midX - bw / 2));
+        const bg = color === "#2563EB" ? "#EFF6FF" : color === "#059669" ? "#ECFDF5" : "#F5F3FF";
+        svg.appendChild(svgEl("rect", {
+          x: bx, y: labelY - 16, width: bw, height: 24, rx: 12,
+          fill: bg, stroke: color, "stroke-width": 1.8
+        }));
+        svg.appendChild(svgEl("text", {
+          x: bx + bw / 2, y: labelY, "text-anchor": "middle", "font-size": 11.5, "font-weight": "800", fill: color
+        }, labelText));
+      };
+
+      const drawResultBanner = (text) => {
+        const w = Math.max(260, text.length * 8.2);
+        const rx = (920 - w) / 2;
+        svg.appendChild(svgEl("rect", {
+          x: rx, y: 282, width: w, height: 28, rx: 14,
+          fill: "#ECFDF5", stroke: "#059669", "stroke-width": 2
+        }));
+        svg.appendChild(svgEl("text", {
+          x: 460, y: 300, "text-anchor": "middle", "font-size": 12.5, "font-weight": "800", fill: "#047857"
+        }, text));
+      };
+
+      /* ----------------- EJERCICIO 1 ----------------- */
+      if (exId === 1) {
+        drawAxis();
+        const xAt = (t) => 75 + t * 84;
+        // Zona de gracia
+        svg.appendChild(svgEl("rect", {
+          x: xAt(0), y: axisY - 11, width: xAt(3) - xAt(0), height: 22, rx: 5,
+          fill: "#F1F5F9", stroke: "#CBD5E1", "stroke-dasharray": "4 3"
+        }));
+        svg.appendChild(svgEl("text", {
+          x: (xAt(0) + xAt(3)) / 2, y: axisY + 4, "text-anchor": "middle", "font-size": 10.5, "font-weight": "700", fill: "#64748B"
+        }, "3 meses sin pago"));
+
+        for (let t = 0; t <= 9; t++) {
+          drawTick(xAt(t), `m=${t}`, t === 0 && step >= 2, "#EA580C");
+        }
+        drawFlowArrow(xAt(0), "D = ?", "up", "#EA580C", "url(#ex-arrow-orange)");
+        for (let t = 4; t <= 9; t++) {
+          drawFlowArrow(xAt(t), "$450", "down", "#1E293B");
+        }
+        if (step >= 2) drawFF(xAt(0), "FF = 0");
+        if (step >= 3) {
+          // Caja de los 6 pagos
+          svg.appendChild(svgEl("rect", {
+            x: xAt(4) - 24, y: axisY + 36, width: xAt(9) - xAt(4) + 48, height: 64, rx: 10,
+            fill: "rgba(37,99,235,0.07)", stroke: "#2563EB", "stroke-dasharray": "5 3"
+          }));
+          // Paso 3a: agrupar en t=3
+          drawCurvedMove(xAt(9), xAt(3), 108, "#2563EB", "url(#ex-arrow-blue)", "1) a₆|3% cae en t=3 ($2,437.74)", 106, false);
+          svg.appendChild(svgEl("circle", { cx: xAt(3), cy: axisY, r: 12, fill: "rgba(37,99,235,0.22)", class: "pin-pulse" }));
+          svg.appendChild(svgEl("circle", { cx: xAt(3), cy: axisY, r: 6.5, fill: "#2563EB", stroke: "#FFF", "stroke-width": 2 }));
+          // Paso 3b: descontar 3 meses a t=0
+          drawCurvedMove(xAt(3), xAt(0), 60, "#2563EB", "url(#ex-arrow-blue)", "2) Atrás 3 meses · ×(1.03)⁻³", 58, true);
+        }
+        if (step >= 4) drawResultBanner("✓ Deuda original en t = 0: D = $2,230.87");
+      }
+
+      /* ----------------- EJERCICIO 2 ----------------- */
+      else if (exId === 2) {
+        drawAxis();
+        const xAt = (t) => 68 + t * 71;
+        for (let t = 0; t <= 11; t++) {
+          const isFF = (variant === "ff3" && t === 3) || (variant === "ff0" && t === 0);
+          drawTick(xAt(t), `t=${t}`, isFF && step >= 2, "#EA580C");
+        }
+        drawFlowArrow(xAt(0), "$50,000", "up", "#059669", "url(#ex-arrow-green)");
+        for (let t = 4; t <= 11; t++) {
+          drawFlowArrow(xAt(t), "R", "down", "#1E293B");
+        }
+
+        if (step >= 2) {
+          drawFF(variant === "ff3" ? xAt(3) : xAt(0), variant === "ff3" ? "FF = 3 (trim.)" : "FF = 0 (hoy)");
+        }
+        if (step >= 3) {
+          svg.appendChild(svgEl("rect", {
+            x: xAt(4) - 20, y: axisY + 36, width: xAt(11) - xAt(4) + 40, height: 64, rx: 10,
+            fill: "rgba(37,99,235,0.07)", stroke: "#2563EB", "stroke-dasharray": "5 3"
+          }));
+          if (variant === "ff3") {
+            drawCurvedMove(xAt(0), xAt(3), 72, "#059669", "url(#ex-arrow-green)", "Adelante 3 trim. ×(1.04)⁺³ → $56,243.20", 66, false);
+            drawCurvedMove(xAt(11), xAt(3), 112, "#2563EB", "url(#ex-arrow-blue)", "8 pagos con a₈|4% caen directo en t=3", 112, true);
+          } else {
+            drawCurvedMove(xAt(11), xAt(3), 112, "#2563EB", "url(#ex-arrow-blue)", "1) a₈|4% cae en t=3", 112, false);
+            drawCurvedMove(xAt(3), xAt(0), 62, "#2563EB", "url(#ex-arrow-blue)", "2) Atrás 3 trim. ×(1.04)⁻³", 58, true);
+          }
+          svg.appendChild(svgEl("circle", { cx: xAt(3), cy: axisY, r: 11, fill: "rgba(37,99,235,0.22)", class: "pin-pulse" }));
+          svg.appendChild(svgEl("circle", { cx: xAt(3), cy: axisY, r: 6, fill: "#2563EB", stroke: "#FFF", "stroke-width": 2 }));
+        }
+        if (step >= 4) drawResultBanner("✓ Con cualquier Fecha Focal: R = $8,353.68 trimestrales");
+      }
+
+      /* ----------------- EJERCICIO 3 ----------------- */
+      else if (exId === 3) {
+        drawAxis();
+        const pts = [
+          { x: 90, lbl: "t=0", pay: "$1,300" },
+          { x: 205, lbl: "t=1", pay: "$1,300" },
+          { x: 320, lbl: "t=2", pay: "$1,300" },
+          { x: 540, lbl: "t=n−2", pay: "$1,300" },
+          { x: 660, lbl: "t=n−1", pay: "$1,300 (último)" },
+          { x: 810, lbl: "t=n (Retiro)", pay: null }
+        ];
+        // Puntos suspensivos
+        svg.appendChild(svgEl("text", { x: 430, y: axisY - 12, "text-anchor": "middle", "font-size": 22, "font-weight": "800", fill: "#94A3B8" }, "···"));
+
+        pts.forEach((p, idx) => {
+          drawTick(p.x, p.lbl, idx === 5 && step >= 2, "#EA580C");
+          if (p.pay) drawFlowArrow(p.x, p.pay, "down", "#1E293B");
+        });
+        drawFlowArrow(810, "M = $56,559.94", "up", "#059669", "url(#ex-arrow-green)");
+
+        // Resalte mes extra entre último depósito y retiro
+        svg.appendChild(svgEl("rect", {
+          x: 660, y: axisY - 11, width: 150, height: 22, rx: 6,
+          fill: "#F5F3FF", stroke: "#7C3AED", "stroke-dasharray": "4 3"
+        }));
+        svg.appendChild(svgEl("text", {
+          x: 735, y: axisY + 4, "text-anchor": "middle", "font-size": 10.5, "font-weight": "800", fill: "#6D28D9"
+        }, "+1 mes extra (anticipada)"));
+
+        if (step >= 2) drawFF(810, "FF = Retiro (t=n)");
+        if (step >= 3) {
+          drawCurvedMove(90, 660, 108, "#059669", "url(#ex-arrow-green)", "1) sₙ|1% cae EN el último depósito (t=n−1)", 106, false);
+          drawCurvedMove(660, 810, 62, "#7C3AED", "url(#ex-arrow-purple)", "2) ×(1.01)⁺¹ al retiro", 58, true);
+        }
+        if (step >= 4) drawResultBanner("✓ (1.01)ⁿ = 1.430769 ⇒ n = 36 meses (3 años)");
+      }
+
+      /* ----------------- EJERCICIO 4 ----------------- */
+      else if (exId === 4) {
+        drawAxis();
+        const nodes = [
+          { x: 80, lbl: "t=0" },
+          { x: 195, lbl: "t=1" },
+          { x: 300, lbl: "t=2" },
+          { x: 540, lbl: "t=35" },
+          { x: 660, lbl: "t=36 (último)" },
+          { x: 815, lbl: "t=37 (extra)" }
+        ];
+        svg.appendChild(svgEl("text", { x: 420, y: axisY - 12, "text-anchor": "middle", "font-size": 22, "font-weight": "800", fill: "#94A3B8" }, "···"));
+        nodes.forEach((n, idx) => drawTick(n.x, n.lbl, idx === 0 && step >= 2, "#EA580C"));
+
+        drawFlowArrow(80, "D = $79,000", "up", "#EA580C", "url(#ex-arrow-orange)");
+        [195, 300, 540, 660].forEach((x) => drawFlowArrow(x, "$3,175", "down", "#1E293B"));
+        drawFlowArrow(815, "X = ?", "down", "#7C3AED", "url(#ex-arrow-purple)");
+
+        if (step >= 2) drawFF(80, "FF = 0");
+        if (step >= 3) {
+          drawCurvedMove(660, 80, 114, "#2563EB", "url(#ex-arrow-blue)", "36 pagos con a₃₆|i → $78,802.46 en t=0", 112, false);
+          drawCurvedMove(815, 80, 56, "#7C3AED", "url(#ex-arrow-purple)", "Pago extra X regresa 37 meses · ×(1+i)⁻³⁷", 54, true);
+        }
+        if (step >= 4) drawResultBanner("✓ 36 pagos completos y pago extra en t = 37: X = $436.62");
+      }
+
+      /* ----------------- EJERCICIO 5 ----------------- */
+      else if (exId === 5) {
+        drawAxis();
+        const nodes = [
+          { x: 90, lbl: "t=0" },
+          { x: 215, lbl: "t=1" },
+          { x: 330, lbl: "t=2" },
+          { x: 575, lbl: "t=12" },
+          { x: 760, lbl: "t=13 (último + extra)" }
+        ];
+        svg.appendChild(svgEl("text", { x: 452, y: axisY - 12, "text-anchor": "middle", "font-size": 22, "font-weight": "800", fill: "#94A3B8" }, "···"));
+        nodes.forEach((n, idx) => drawTick(n.x, n.lbl, idx === 0 && step >= 2, "#EA580C"));
+
+        drawFlowArrow(90, "D = $85,000 (130k − 45k)", "up", "#EA580C", "url(#ex-arrow-orange)");
+        [215, 330, 575].forEach((x) => drawFlowArrow(x, "$7,300", "down", "#1E293B"));
+        // En t=13 ocurren juntos $7,300 + X
+        drawFlowArrow(760, "$7,300 + X (juntos)", "down", "#7C3AED", "url(#ex-arrow-purple)");
+
+        if (step >= 2) drawFF(90, "FF = 0");
+        if (step >= 3) {
+          drawCurvedMove(760, 90, 114, "#2563EB", "url(#ex-arrow-blue)", "13 pagos con a₁₃|1.8% → $83,945.78 en t=0", 112, false);
+          drawCurvedMove(760, 90, 58, "#7C3AED", "url(#ex-arrow-purple)", "X está EN t=13 → regresa 13 meses ×(1.018)⁻¹³", 56, true);
+        }
+        if (step >= 4) drawResultBanner("✓ 13 pagos completos y cantidad extra en t = 13: X = $1,329.39");
+      }
+
+      /* ----------------- EJERCICIO 6 ----------------- */
+      else if (exId === 6) {
+        drawAxis();
+        const x0 = 75, x1 = 165, x36 = 435, x37 = 530, x120 = 845;
+        drawTick(x0, "t=0");
+        drawTick(x1, "t=1");
+        drawTick(x36, "t=36 (3 años)", step >= 2, "#EA580C");
+        drawTick(x37, "t=37");
+        drawTick(x120, "t=120");
+        svg.appendChild(svgEl("text", { x: 300, y: axisY - 10, "text-anchor": "middle", "font-size": 20, "font-weight": "800", fill: "#94A3B8" }, "··· 36 pagos ···"));
+        svg.appendChild(svgEl("text", { x: 690, y: axisY - 10, "text-anchor": "middle", "font-size": 20, "font-weight": "800", fill: "#94A3B8" }, "··· 84 pagos ···"));
+
+        const isRetro = variant === "retro";
+        drawFlowArrow(x0, "$200,000", "up", isRetro ? "#059669" : "#94A3B8", isRetro ? "url(#ex-arrow-green)" : "url(#ex-arrow-slate)");
+        drawFlowArrow(x1, "R", "down", isRetro ? "#059669" : "#94A3B8", isRetro ? "url(#ex-arrow-green)" : "url(#ex-arrow-slate)");
+        drawFlowArrow(x36, "R (pago 36)", "down", isRetro ? "#059669" : "#94A3B8", isRetro ? "url(#ex-arrow-green)" : "url(#ex-arrow-slate)");
+        drawFlowArrow(x37, "R (pago 37)", "down", !isRetro ? "#2563EB" : "#94A3B8", !isRetro ? "url(#ex-arrow-blue)" : "url(#ex-arrow-slate)");
+        drawFlowArrow(x120, "R (pago 120)", "down", !isRetro ? "#2563EB" : "#94A3B8", !isRetro ? "url(#ex-arrow-blue)" : "url(#ex-arrow-slate)");
+
+        if (step >= 2) drawFF(x36, "CORTE FF = 36");
+        if (step >= 3) {
+          if (!isRetro) {
+            // Zona futura azul
+            svg.appendChild(svgEl("rect", {
+              x: x37 - 30, y: axisY + 35, width: x120 - x37 + 65, height: 65, rx: 10,
+              fill: "rgba(37,99,235,0.08)", stroke: "#2563EB", "stroke-dasharray": "5 3"
+            }));
+            drawCurvedMove(x120, x36, 72, "#2563EB", "url(#ex-arrow-blue)", "Prospectivo: 84 pagos atrás con a₈₄|2.5% → cae en t=36", 68, false);
+          } else {
+            // Zona pasada verde
+            svg.appendChild(svgEl("rect", {
+              x: x1 - 24, y: axisY + 35, width: x36 - x1 + 60, height: 65, rx: 10,
+              fill: "rgba(5,150,105,0.08)", stroke: "#059669", "stroke-dasharray": "5 3"
+            }));
+            drawCurvedMove(x0, x36, 56, "#059669", "url(#ex-arrow-green)", "1) Deuda adelante ×(1.025)³⁶ = $486,507.04", 54, false);
+            drawCurvedMove(x1, x36, 114, "#059669", "url(#ex-arrow-green)", "2) Menos 36 pagos s₃₆|2.5% = −$302,113.57", 112, true);
+          }
+        }
+        if (step >= 4) drawResultBanner("✓ Prospectivo = Retrospectivo = $184,393.47");
+      }
+
+      /* ----------------- EJERCICIO 7 ----------------- */
+      else if (exId === 7) {
+        drawAxis();
+        const xAt = (t) => 110 + t * 140;
+        for (let t = 0; t <= 5; t++) {
+          drawTick(xAt(t), `año ${t}`, t === 3 && step >= 2, "#EA580C");
+        }
+        [1, 2].forEach((t) => drawFlowArrow(xAt(t), "$3,343.80 (ya pagado)", "down", "#94A3B8"));
+        [3, 4, 5].forEach((t) => drawFlowArrow(xAt(t), "$3,343.80", "down", "#7C3AED", "url(#ex-arrow-purple)"));
+
+        // Lupa en t=3⁻ (justo a la izquierda del pago 3)
+        const xCut = xAt(3) - 18;
+        if (step >= 2) {
+          drawFF(xCut, "FF = t = 3⁻ (JUSTO ANTES)");
+          // Círculo lupa
+          svg.appendChild(svgEl("circle", {
+            cx: xCut, cy: axisY, r: 16, fill: "rgba(124,58,237,0.16)", stroke: "#7C3AED", "stroke-width": 2, class: "pin-pulse"
+          }));
+        }
+        if (step >= 3) {
+          svg.appendChild(svgEl("rect", {
+            x: xAt(3) - 32, y: axisY + 35, width: xAt(5) - xAt(3) + 64, height: 65, rx: 10,
+            fill: "rgba(124,58,237,0.08)", stroke: "#7C3AED", "stroke-dasharray": "5 3"
+          }));
+          drawCurvedMove(xAt(5), xCut, 72, "#7C3AED", "url(#ex-arrow-purple)", "Quedan 3 pagos (3, 4 y 5) → Anticipada ä₃|20% = a₃|20%(1.20)", 68, false);
+        }
+        if (step >= 4) drawResultBanner("✓ Saldo insoluto justo antes del 3er pago: SI₃⁻ = $8,452.38");
+      }
+
+      /* ----------------- EJERCICIO 8 ----------------- */
+      else if (exId === 8) {
+        drawAxis();
+        const xAt = (t) => 95 + t * 115;
+        for (let t = 0; t <= 4; t++) {
+          drawTick(xAt(t), `m=${t}`, t === 4 && step >= 2, "#EA580C");
+        }
+        // Futuro desconocido con signos de interrogación
+        svg.appendChild(svgEl("rect", {
+          x: xAt(4) + 38, y: axisY - 26, width: 270, height: 52, rx: 12,
+          fill: "#FEF2F2", stroke: "#EF4444", "stroke-dasharray": "5 4"
+        }));
+        svg.appendChild(svgEl("text", {
+          x: xAt(4) + 173, y: axisY - 4, "text-anchor": "middle", "font-size": 12, "font-weight": "800", fill: "#B91C1C"
+        }, "m=5, 6, ... n = ¿? (No sabemos n)"));
+        svg.appendChild(svgEl("text", {
+          x: xAt(4) + 173, y: axisY + 14, "text-anchor": "middle", "font-size": 11, "font-weight": "600", fill: "#DC2626"
+        }, "✗ Imposible mirar al futuro (Prospectivo)"));
+
+        drawFlowArrow(xAt(0), "D = $99,000", "up", "#059669", "url(#ex-arrow-green)");
+        for (let t = 1; t <= 4; t++) {
+          drawFlowArrow(xAt(t), "$17,200", "down", "#059669", "url(#ex-arrow-green)");
+        }
+
+        if (step >= 2) drawFF(xAt(4), "FF = 4 (después del pago 4)");
+        if (step >= 3) {
+          drawCurvedMove(xAt(0), xAt(4), 56, "#059669", "url(#ex-arrow-green)", "1) Deuda adelante ×(1.012)⁴ = $103,838.22", 54, false);
+          drawCurvedMove(xAt(1), xAt(4), 114, "#059669", "url(#ex-arrow-green)", "2) Menos 4 pagos s₄|1.2% = −$70,048.34", 112, true);
+        }
+        if (step >= 4) drawResultBanner("✓ Saldo insoluto (Retrospectivo): SI₄ = $33,789.89");
+      }
+    }
+
+    /* =========================================================================
+       PESTAÑA 3: ASISTENTE DE FÓRMULAS + DETECTOR DE TRAMPAS
+    ========================================================================= */
+    const wizState = {
+      q1: "vp",      // vp | vf | extra | saldo
+      q2: "r_n",     // r_n | d_r_non | m_r
+      q3: "deferred" // end | start | deferred
+    };
+
+    const WIZ_OPTIONS = {
+      q1: [
+        { id: "vp", label: "Valor hoy (Deuda D) o Pago R" },
+        { id: "vf", label: "Valor futuro (Meta M) o Tiempo n de ahorro" },
+        { id: "extra", label: "Número de pagos n y Pago Extra X" },
+        { id: "saldo", label: "Saldo Insoluto (SI_k) a mitad del plazo" }
+      ],
+      q2: [
+        { id: "r_n", label: "Conozco R y el total de pagos n" },
+        { id: "d_r_non", label: "Conozco Deuda D y R (pero NO n)" },
+        { id: "m_r", label: "Conozco Meta futura M y depósito R" }
+      ],
+      q3: [
+        { id: "end", label: "Pagos al FINAL del periodo (o «después del pago k»)" },
+        { id: "start", label: "Pagos al INICIO, «justo antes» o «retiro 1 mes después»" },
+        { id: "deferred", label: "Hay meses/periodos de gracia (Anualidad Diferida)" }
+      ]
+    };
+
+    function setWiz(q, val) {
+      wizState[q] = val;
+      // Ajuste inteligente para coherencia al seleccionar opciones clave
+      if (q === "q1" && val === "vf") wizState.q2 = "m_r";
+      if (q === "q1" && val === "extra") wizState.q2 = "d_r_non";
+      renderWizard();
+    }
+
+    function computeWizardRecommendation() {
+      const { q1, q2, q3 } = wizState;
+
+      // Caso 1: Saldos insolutos
+      if (q1 === "saldo") {
+        if (q2 === "d_r_non") {
+          return {
+            color: "emerald",
+            dir: "ADELANTE (Verde · Miras al pasado)",
+            title: "Saldo Insoluto — Método Retrospectivo",
+            formula: `SI<sub>k</sub> = D(1 + i)<sup>k</sup> − R · ${mathS("k", "i")}`,
+            trick: "Como NO conoces el total de pagos n, miras hacia atrás: llevas la deuda D y los k pagos ya hechos hacia ADELANTE hasta el corte k y los restas (como en tu Ej. 8)."
+          };
+        }
+        if (q3 === "start") {
+          return {
+            color: "purple",
+            dir: "ATRÁS con trampa «Justo Antes» (Morado/Azul)",
+            title: "Saldo Insoluto Prospectivo — Justo ANTES del pago k",
+            formula: `SI<sub>k<sup>−</sup></sub> = R · ${mathADue("n−k+1", "i")} = R · ${mathA("n−k+1", "i")} · (1 + i)`,
+            trick: "Justo ANTES de pagar el pago k todavía lo debes hoy. Cuenta cuántos pagos quedan INCLUYENDO el de hoy y usa anualidad anticipada (como en tu Ej. 7)."
+          };
+        }
+        return {
+          color: "blue",
+          dir: "ATRÁS (Azul · Miras al futuro)",
+          title: "Saldo Insoluto — Método Prospectivo",
+          formula: `SI<sub>k</sub> = R · ${mathA("n−k", "i")}`,
+          trick: "Conoces R y n. Solo cuenta cuántos pagos FALTAN (n − k) y tráelos hacia ATRÁS al momento k con a_(n−k)|i (como en tu Ej. 6)."
+        };
+      }
+
+      // Caso 2: Pagos extra
+      if (q1 === "extra") {
+        const atSame = q3 === "start";
+        return {
+          color: "purple",
+          dir: "Primero ATRÁS a t = 0, luego faltante ADELANTE",
+          title: atSame ? "Pago Extra EN el último pago completo (t = n)" : "Pago Extra 1 periodo DESPUÉS del último completo (t = n + 1)",
+          formula: atSame
+            ? `D = R · ${mathA("n", "i")} + X(1+i)<sup>−n</sup> &nbsp;⇒&nbsp; X = (D − R·${mathA("n", "i")})(1+i)<sup>+n</sup>`
+            : `D = R · ${mathA("n", "i")} + X(1+i)<sup>−(n+1)</sup> &nbsp;⇒&nbsp; X = (D − R·${mathA("n", "i")})(1+i)<sup>+(n+1)</sup>`,
+          trick: "Paso 1: Halla n con logaritmos y quédate con la parte entera. Paso 2: Calcula cuánto falta en t = 0. Paso 3: Avanza ese faltante hasta el mes exacto donde te pidan X (n si es junto al último pago como Ej. 5; n+1 si es un mes después como Ej. 4)."
+        };
+      }
+
+      // Caso 3: Valor futuro / Ahorro
+      if (q1 === "vf") {
+        if (q3 === "start") {
+          return {
+            color: "emerald",
+            dir: "ADELANTE (Verde · Anualidad Anticipada)",
+            title: "Monto Futuro con Anualidad Anticipada (retiro 1 periodo después)",
+            formula: `M = R · ${mathSDue("n", "i")} = R · ${mathS("n", "i")} · (1 + i)`,
+            trick: "Si el dinero se retira 1 mes después del último depósito (como en tu Ej. 3) o los depósitos son al inicio del mes, s_n|i se multiplica por (1 + i)."
+          };
+        }
+        return {
+          color: "emerald",
+          dir: "ADELANTE (Verde · Capitalizar)",
+          title: "Monto Futuro con Anualidad Vencida",
+          formula: `M = R · ${mathS("n", "i")} = R · ${frac("(1 + i)<sup>n</sup> − 1", "i")}`,
+          trick: "s_n|i acumula todos los depósitos hacia ADELANTE y cae EXACTAMENTE en la fecha del último depósito."
+        };
+      }
+
+      // Caso 4: Valor presente / Deuda / Pago R
+      if (q3 === "deferred") {
+        return {
+          color: "blue",
+          dir: "ATRÁS en 2 brincos (Azul · Diferida)",
+          title: "Anualidad Diferida (con periodo de gracia)",
+          formula: `D = R · ${mathA("n", "i")} · (1 + i)<sup>−k</sup> &nbsp;&nbsp;(ó &nbsp; D(1+i)<sup>+k</sup> = R · ${mathA("n", "i")})`,
+          trick: "Si el primer pago es en el mes m, a_n|i cae en m − 1. Por eso k = m − 1 (ejemplo: primer pago en mes 4 ⇒ k = 3, como en tus Ej. 1 y 2)."
+        };
+      }
+      if (q3 === "start") {
+        return {
+          color: "blue",
+          dir: "ATRÁS (Azul · Anticipada)",
+          title: "Valor Presente de Anualidad Anticipada",
+          formula: `D = R · ${mathADue("n", "i")} = R · ${mathA("n", "i")} · (1 + i)`,
+          trick: "Como el primer pago es HOY (t = 0), ä_n|i cae directamente en el primer pago sin tener que mover nada extra."
+        };
+      }
+      return {
+        color: "blue",
+        dir: "ATRÁS (Azul · Valor Presente Vencida)",
+        title: "Valor Presente de Anualidad Vencida Estándar",
+        formula: `D = R · ${mathA("n", "i")} = R · ${frac("1 − (1 + i)<sup>−n</sup>", "i")}`,
+        trick: "El primer pago es en t = 1 y a_n|i te deja parado exactamente en t = 0 (un periodo antes del primer pago)."
+      };
+    }
+
+    function renderWizard() {
+      ["q1", "q2", "q3"].forEach((qKey) => {
+        const box = document.getElementById(`wiz-${qKey}`);
+        box.innerHTML = WIZ_OPTIONS[qKey]
+          .map((opt) => {
+            const active = wizState[qKey] === opt.id;
+            const cls = active
+              ? "w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-orange-500 bg-orange-50 text-orange-900 text-xs sm:text-sm font-bold shadow-sm transition-all"
+              : "w-full text-left px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-medium transition-all";
+            return `<button onclick="setWiz('${qKey}', '${opt.id}')" class="${cls}">${opt.label}</button>`;
+          })
+          .join("");
+      });
+
+      const rec = computeWizardRecommendation();
+      const palettes = {
+        blue: { wrap: "bg-blue-50/70 border-blue-300", badge: "bg-blue-600 text-white", title: "text-blue-950" },
+        emerald: { wrap: "bg-emerald-50/70 border-emerald-300", badge: "bg-emerald-600 text-white", title: "text-emerald-950" },
+        purple: { wrap: "bg-violet-50/70 border-violet-300", badge: "bg-violet-600 text-white", title: "text-violet-950" }
+      };
+      const pal = palettes[rec.color];
+
+      const resBox = document.getElementById("wiz-result");
+      resBox.className = `mt-6 rounded-2xl border-2 p-5 transition-all ${pal.wrap}`;
+      resBox.innerHTML = `
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="px-3 py-1 rounded-full text-xs font-extrabold ${pal.badge}">${rec.dir}</span>
+        </div>
+        <h3 class="text-base sm:text-lg font-extrabold ${pal.title}">${rec.title}</h3>
+        <div class="my-3 bg-white border border-slate-200 rounded-xl px-4 py-3 text-base sm:text-xl font-bold text-slate-900 inline-block shadow-sm">
+          ${rec.formula}
+        </div>
+        <p class="text-sm text-slate-700 leading-relaxed">
+          <strong class="text-slate-900">Truco para el examen:</strong> ${rec.trick}
+        </p>
+      `;
+    }
+
+    /* ----------------- MINI-RETO: DETECTOR DE TRAMPAS ----------------- */
+    const QUIZ_QUESTIONS = [
+      {
+        q: "1. Tienes 6 pagos mensuales y el primer pago ocurre en el mes 4 (t = 4). Al calcular R · a₆|i, ¿en qué mes exacto cae ese valor?",
+        options: [
+          "En t = 0 (hoy)",
+          "En t = 3 (un mes antes del primer pago)",
+          "En t = 4 (en el primer pago)",
+          "En t = 9 (en el último pago)"
+        ],
+        correct: 1,
+        feedback: "¡Exacto! La fórmula vencida aₙ|i SIEMPRE te deja parado 1 periodo ANTES del primer pago. Como el primer pago es en t = 4, cae en t = 3 y luego solo regresas 3 meses a t = 0."
+      },
+      {
+        q: "2. Te piden el saldo insoluto de una deuda de 5 pagos anuales «JUSTO ANTES de realizar el tercer pago». ¿Cuántos pagos debes incluir y qué fórmula usas?",
+        options: [
+          "Faltan 2 pagos (4 y 5), usando anualidad vencida a₂|i",
+          "Faltan 3 pagos (3, 4 y 5), usando anualidad vencida a₃|i",
+          "Faltan 3 pagos (3, 4 y 5), usando anualidad anticipada ä₃|i = a₃|i · (1+i)",
+          "Ya se pagaron 3 pagos, así que uso s₃|i"
+        ],
+        correct: 2,
+        feedback: "¡Trampa desactivada! Justo ANTES del pago 3 todavía debes ese pago (que vence hoy mismo), el 4 y el 5. Al haber un pago hoy en tu fecha focal, se evalúa como anticipada ä₃|i."
+      },
+      {
+        q: "3. Haces depósitos mensuales para ahorrar un monto M y el problema dice: «El dinero se retira un mes después del último depósito». ¿Qué cambia en la fórmula?",
+        options: [
+          "Nada, uso sₙ|i normal",
+          "Debo multiplicar sₙ|i por (1 + i) porque el último depósito gana 1 mes extra de interés",
+          "Debo dividir sₙ|i entre (1 + i)",
+          "Debo cambiar sₙ|i por aₙ|i"
+        ],
+        correct: 1,
+        feedback: "¡Correcto! sₙ|i cae en el instante del último depósito. Al esperar un mes más antes de retirar, todo el bloque avanza 1 periodo multiplicando por (1 + i), convirtiéndose en s̈ₙ|i."
+      },
+      {
+        q: "4. Te dan el precio de una mercancía ($99,000), el pago mensual ($17,200) y la tasa (1.2%), pero NO te dicen cuántos pagos son en total (n). Te piden el saldo insoluto tras el pago 4. ¿Qué método conviene?",
+        options: [
+          "Prospectivo, porque siempre es más corto",
+          "Retrospectivo: D(1+i)⁴ − R·s₄|i, llevando todo lo que ya pasó hacia adelante hasta t = 4",
+          "Anualidad diferida, regresando 4 meses",
+          "No se puede resolver sin calcular primero el monto futuro total"
+        ],
+        correct: 1,
+        feedback: "¡Brillante! Sin conocer n, no sabes cuántos pagos faltan en el futuro. El método retrospectivo solo necesita el pasado (D y los k = 4 pagos ya hechos) avanzados hacia t = 4."
+      },
+      {
+        q: "5. Al despejar n en un préstamo obtienes n = 13.184 pagos. ¿Cuál es la diferencia entre hacer el pago extra X «al momento del último pago completo» vs «un mes después del último pago completo»?",
+        options: [
+          "Ninguna, el pago extra X es exactamente el mismo en ambos casos",
+          "En el mes 13 el faltante en t=0 se multiplica por (1+i)¹³; un mes después (mes 14) se multiplica por (1+i)¹⁴",
+          "En el mes 13 se usa (1+i)⁻¹³ y en el mes 14 se usa (1+i)⁻¹⁴",
+          "Si es en el mes 13, se hacen 14 pagos completos en lugar de 13"
+        ],
+        correct: 1,
+        feedback: "¡Dominado! En ambos casos son 13 pagos completos, pero el dinero faltante en t = 0 gana un mes más de intereses si lo pagas en el mes 14 en lugar de pagarlo junto al mes 13."
+      }
+    ];
+
+    const quizAnswers = {}; // index -> chosenOptionIndex
+
+    function answerQuiz(qIdx, optIdx) {
+      if (quizAnswers[qIdx] !== undefined) return; // bloquea doble clic para mantener marcador honesto
+      quizAnswers[qIdx] = optIdx;
+      renderQuiz();
+    }
+
+    function resetQuiz() {
+      Object.keys(quizAnswers).forEach((k) => delete quizAnswers[k]);
+      renderQuiz();
+    }
+
+    function renderQuiz() {
+      let score = 0;
+      const container = document.getElementById("quiz-container");
+      container.innerHTML = QUIZ_QUESTIONS.map((item, qIdx) => {
+        const chosen = quizAnswers[qIdx];
+        const answered = chosen !== undefined;
+        const isCorrect = answered && chosen === item.correct;
+        if (isCorrect) score++;
+
+        const optsHtml = item.options
+          .map((opt, optIdx) => {
+            let cls = "w-full text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all ";
+            if (!answered) {
+              cls += "border-slate-200 bg-white hover:bg-violet-50 hover:border-violet-300 text-slate-700 cursor-pointer";
+            } else if (optIdx === item.correct) {
+              cls += "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold";
+            } else if (optIdx === chosen && optIdx !== item.correct) {
+              cls += "border-rose-400 bg-rose-50 text-rose-900 font-bold";
+            } else {
+              cls += "border-slate-200 bg-slate-50 text-slate-400";
+            }
+            return `<button onclick="answerQuiz(${qIdx}, ${optIdx})" class="${cls}">${opt}</button>`;
+          })
+          .join("");
+
+        const feedbackHtml = answered
+          ? `<div class="mt-3 p-3 rounded-xl text-xs sm:text-sm leading-relaxed ${
+              isCorrect ? "bg-emerald-50 border border-emerald-200 text-emerald-900" : "bg-rose-50 border border-rose-200 text-rose-900"
+            }">
+              <strong>${isCorrect ? "✓ ¡Correcto!" : "✗ Cuidado con la trampa:"}</strong> ${item.feedback}
+            </div>`
+          : "";
+
+        return `
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <p class="text-sm sm:text-base font-bold text-slate-900 mb-3">${item.q}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${optsHtml}</div>
+            ${feedbackHtml}
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("quiz-score").textContent = score;
+    }
+
+    /* =========================================================================
+       INICIALIZACIÓN
+    ========================================================================= */
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        updateCompassButtons();
+        renderCompassExplanation();
+        renderCompassSVG(true);
+        updateCompassPhasePills(2);
+
+        buildExerciseSelectors();
+        renderExerciseView();
+
+        renderWizard();
+        renderQuiz();
+      } catch (err) {
+        console.error("Error al inicializar el laboratorio:", err);
+      }
+    });
+  </script>
+</body>
+</html>

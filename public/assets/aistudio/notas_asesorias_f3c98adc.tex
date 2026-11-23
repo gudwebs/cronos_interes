@@ -1,0 +1,175 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+% Colores personalizados para las cajas
+\definecolor{azulpizarra}{RGB}{0, 102, 153}
+\definecolor{verdepizarra}{RGB}{0, 128, 96}
+\definecolor{rojopizarra}{RGB}{204, 0, 0}
+
+\title{\textbf{Guía de Estudio: Matemáticas Financieras}\\ \large Reconstrucción y Análisis de Asesorías}
+\author{Resumen de clase}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% ==========================================
+% SECCIÓN 1: FUNDAMENTOS
+% ==========================================
+\section{Fundamentos: Líneas de Tiempo y Ecuaciones de Valor}
+
+\begin{tcolorbox}[colback=azulpizarra!5!white, colframe=azulpizarra, title=Reglas de la Línea de Tiempo y Fecha Focal]
+Para resolver problemas de equivalencia financiera, se debe elegir una \textbf{Fecha Focal} (F.F.), que es el punto en el tiempo donde se igualan las obligaciones (deudas/depósitos) y los pagos (retiros).
+\begin{itemize}
+    \item \textbf{Regla de oro:} Si el dinero está a la \textbf{derecha} de la fecha focal (es un valor futuro), se \textbf{multiplica} por \((1+i)^t\). Si está a la \textbf{izquierda} (es un valor presente), se \textbf{divide} entre \((1+i)^t\) o se multiplica por \((1+i)^{-t}\) (o \(V^t\), donde \(V = \frac{1}{1+i}\)).
+    \item \textbf{Ecuación de valor general:} \(\text{Deuda} = \text{Pagos}\) o \(\text{Depósitos} = \text{Retiros}\).
+\end{itemize}
+\end{tcolorbox}
+
+\subsection*{Problema 1: Cálculo de Depósitos para cubrir Retiros}
+\textbf{Enunciado:} Vas a realizar 3 depósitos empezando hoy, otro al mes 5, y otro al 10, de tal forma que puedas hacer 3 retiros de \$20,000 cada uno, el primero 4 meses después del último depósito, el otro a los 8 y a los 12. Tasa mensual de 2\%. ¿De cuánto deben ser los depósitos?
+
+\textbf{Línea de tiempo:}
+\begin{itemize}
+    \item Depósitos (\(X\)): \(t=0\) (hoy), \(t=5\), \(t=10\).
+    \item Retiros (\$20,000): \(t=14\) (\(10+4\)), \(t=18\) (\(10+8\)), \(t=22\) (\(10+12\)).
+    \item Tasa: \(i = 2\% = 0.02\) mensual.
+\end{itemize}
+
+\textbf{Planteamiento (Fecha Focal en \(t=0\)):}
+\[
+X + \frac{X}{(1.02)^5} + \frac{X}{(1.02)^{10}} = \frac{20,000}{(1.02)^{14}} + \frac{20,000}{(1.02)^{18}} + \frac{20,000}{(1.02)^{22}}
+\]
+\textbf{Desarrollo:}
+\begin{align*}
+X + 0.90573X + 0.82035X &= 15,157.51 + 14,005.83 + 12,936.98 \\
+2.72607911X &= 42,097.46821 \\
+X &= \frac{42,097.46821}{2.72607911} \approx 15,442.48
+\end{align*}
+\textit{Nota: El pizarrón muestra \(X \approx 15,248.33\) debido al redondeo de decimales en pasos intermedios.}
+
+\subsection*{Problema 2: Ahorro para Graduación}
+\textbf{Enunciado:} Para tu graduación dentro de 30 meses, necesitas acumular \$130,000. Tasa de 1.5\% mensual. Depósitos: Hoy \$15,000; Mes 4: \$20,000; Mes 12: \$20,000; Mes 18: \$20,000 (según cálculos del profesor); Mes 24: \(X\).
+
+\textbf{Planteamiento (Fecha Focal en \(t=0\)):}
+\[
+15,000 + \frac{20,000}{(1.015)^4} + \frac{20,000}{(1.015)^{12}} + \frac{20,000}{(1.015)^{18}} + \frac{X}{(1.015)^{24}} = \frac{130,000}{(1.015)^{30}}
+\]
+\textbf{Cálculos:}
+\begin{align*}
+18,843.68 + 16,727.75 + 15,298.23 + 0.69954X &= 83,169.11 \\
+50,869.66 + 0.69954X &= 83,169.11 \quad \textit{(Nótese que omitió el depósito inicial de 15k en la suma)} \\
+0.69954X &= 32,299.45 \\
+X &\approx 46,172.41
+\end{align*}
+
+\textbf{Planteamiento Alternativo (Fecha Focal en \(t=30\)):}
+\[
+15,000(1.015)^{30} + 20,000(1.015)^{26} + 20,000(1.015)^{18} + 20,000(1.015)^{12} + X(1.015)^6 = 130,000
+\]
+
+\newpage
+% ==========================================
+% SECCIÓN 2: TASAS DE INTERÉS
+% ==========================================
+\section{Conversión de Tasas de Interés}
+
+\begin{tcolorbox}[colback=verdepizarra!5!white, colframe=verdepizarra, title=Equivalencia de Tasas]
+El objetivo es igualar rendimientos cuando las tasas tienen diferentes periodos de capitalización:
+\[ (1 + i_{\text{nueva}}) = (1 + i_{\text{original}})^{\frac{\text{periodo original}}{\text{nuevo periodo}}} \]
+\end{tcolorbox}
+
+\textbf{Ejemplos de la clase:}
+\begin{itemize}
+    \item \textbf{Tasa Nominal a Efectiva:} \(i^{(2)} = \frac{8\%}{2} = 4\% = i_s\) (Tasa semestral).
+    \item \textbf{Tasa Anual (\(i_a = 12\%\)) a Mensual (\(i_m\)):} 
+    \[ (1.12) = (1 + i_m)^{12} \implies i_m = (1.12)^{1/12} - 1 \]
+    \item \textbf{Tasa Semestral (\(i_s = 10\%\)) a Bimestral (\(i_b\)):} (En un semestre hay 3 bimestres)
+    \[ (1.10) = (1 + i_b)^3 \]
+\end{itemize}
+
+% ==========================================
+% SECCIÓN 3: ANUALIDADES
+% ==========================================
+\section{Anualidades: Conceptos y Fórmulas}
+
+Una \textbf{anualidad} es una serie de pagos iguales realizados a intervalos de tiempo iguales. Para no sumar término por término, se utiliza la notación actuarial.
+
+\begin{tcolorbox}[colback=rojopizarra!5!white, colframe=rojopizarra, title=Deducción de la Fórmula de Valor Presente (Pizarra)]
+Sea \(v = \frac{1}{1+i}\) el factor de descuento.
+\begin{itemize}
+    \item \textbf{Vencida (pagos al final del periodo):} \(A_{n|i} = v + v^2 + v^3 + \dots + v^n\). \\
+    Multiplicando por \(v\): \(v A_{n|i} = v^2 + v^3 + \dots + v^{n+1}\).
+    Restando ambas ecuaciones: \(A_{n|i} - v A_{n|i} = v - v^{n+1} \implies A_{n|i}(1-v) = v(1-v^n)\).
+    Como \(1-v = \frac{i}{1+i}\) y \(v = \frac{1}{1+i}\), se simplifica a: \(A_{n|i} = \frac{1 - v^n}{i}\).
+    \item \textbf{Anticipada (pagos al inicio del periodo):} \(\ddot{A}_{n|i} = 1 + v + v^2 + \dots + v^{n-1}\). \\
+    Su suma es: \(\ddot{A}_{n|i} = \frac{1 - v^n}{1 - v}\) (que es igual a \(A_{n|i}(1+i)\)).
+\end{itemize}
+\end{tcolorbox}
+
+\textbf{Resumen de Fórmulas (Pizarra):}
+\begin{itemize}
+    \item \textbf{Valor Presente Vencida:} \(A_{n|i} = \frac{1 - v^n}{i}\)
+    \item \textbf{Valor Presente Anticipada:} \(\ddot{A}_{n|i} = \frac{1 - v^n}{1 - v}\)
+    \item \textbf{Valor Futuro Vencida:} \(S_{n|i} = \frac{(1+i)^n - 1}{i}\)
+    \item \textbf{Valor Futuro Anticipada:} \(\ddot{S}_{n|i} = \frac{(1+i)^n - 1}{1 - v}\)
+\end{itemize}
+
+\newpage
+% ==========================================
+% SECCIÓN 4: APLICACIÓN DE ANUALIDADES
+% ==========================================
+\section{Aplicación de Anualidades}
+
+\subsection*{Problema 3: Deuda con Múltiples Esquemas de Pago}
+\textbf{Enunciado:} Una deuda se paga con: Pagos mensuales vencidos de \$5,000 (24 meses); pagos trimestrales vencidos de \$14,000 (8 trimestres); pagos bimestrales vencidos de \$1,000 (hasta el mes 24, es decir, 12 pagos). Tasa anual \(i_a = 10\%\).
+
+\textbf{Planteamiento (Evaluando en \(t=0\)):}
+\[
+\text{Deuda} = 5000 A_{24|i_m} + 14000 A_{8|i_t} V^{24-m} + 1000 A_{12|i_b} V^{48-m}
+\]
+\textit{Los exponentes \(24-m\) y \(48-m\) (donde \(m=0\) al evaluar hoy) son ajustes temporales para traer los valores presentes de las anualidades trimestrales y bimestrales exactamente a la fecha focal.}
+
+\subsection*{Problema 4: Anualidad Diferida}
+\textbf{Enunciado:} Se tiene una deuda que se pagará con 8 pagos, pero el primero de ellos no inicia hoy, sino hasta el periodo 4.
+
+\textbf{Planteamiento (Pizarra):}
+\[
+\text{Deuda} = 2000 A_{8|i} V^4 \equiv 2000 \ddot{A}_{8|i} V^4
+\]
+\textit{Interpretación:} Calculas el valor de la anualidad de 8 pagos en el periodo 4 (inicio de los pagos) y luego lo descuentas 4 periodos hacia atrás (hasta \(t=0\)) usando \(V^4\). La diferencia entre \(A\) y \(\ddot{A}\) depende de si el pago se hace al final o al inicio del periodo 4.
+
+% ==========================================
+% SECCIÓN 5: PROBLEMAS COMPLEJOS
+% ==========================================
+\section{Problemas Complejos de Equivalencia}
+
+\subsection*{Problema 5: Depósitos y Retiros con Diferentes Periodos}
+\textbf{Enunciado:} Se realizan 40 depósitos trimestrales vencidos de \$5,000. Dos meses después del último depósito, se empiezan a hacer 60 retiros mensuales de \(X\).
+
+\textbf{Línea de tiempo:} Fecha Focal (F.F.) ubicada 2 meses después del último depósito (justo antes de que empiecen los retiros).
+
+\textbf{Ecuación evaluada en la F.F.:}
+\[
+5000 S_{40|i_t} = X A_{60|i_m} V^{\frac{2}{3}}
+\]
+\textbf{Análisis del Profesor:}
+\begin{itemize}
+    \item \textbf{Lado Izquierdo:} \(5000 S_{40|i_t}\) es el monto acumulado al final del trimestre 40. Como la F.F. está 2 meses después, si quisiéramos llevarlo a la F.F. estrictamente, se multiplicaría por \((1+i_t)^{2/3}\) (ya que 2 meses son 2/3 de un trimestre).
+    \item \textbf{Lado Derecho:} \(X A_{60|i_m}\) es el valor presente de los 60 retiros en el momento del primer retiro. Para igualar la ecuación al trimestre 40, se \textbf{descuenta} 2 meses hacia atrás multiplicando por \(V^{2/3}\).
+    \item \textbf{Ecuación alternativa en la pizarra:} \(5000 S_{40|i_t} (1 + i_t)^{2/3} = X A_{60|i_m}\)
+\end{itemize}
+
+\end{document}

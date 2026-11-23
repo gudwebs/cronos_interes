@@ -1,0 +1,6 @@
+{
+  "name": "Cronos Interés — Laboratorio Visual de Teoría del Interés",
+  "description": "Entorno interactivo para visualizar líneas de tiempo, fechas focales, anualidades, amortización, tasas equivalentes y ejercicios paso a paso de Teoría del Interés.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
